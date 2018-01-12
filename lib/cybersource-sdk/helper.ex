@@ -21,4 +21,18 @@ defmodule CyberSourceSDK.Helper do
       Kernel.inspect(value) # Convert to string
     end
   end
+
+  @doc """
+  Decode base64 string to JSON structure
+  """
+  def json_from_base64(base64_string) do
+    case Base.decode64(base64_string) do
+      {:ok, json} ->
+        case Poison.Parser.parse(json) do
+          {:ok, json} -> {:ok, convert_map_to_key_atom(json)}
+          {:error, reason} -> {:error, reason}
+        end
+      _ -> {:error, :bad_base64_encoding}
+    end
+  end
 end

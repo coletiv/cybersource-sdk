@@ -82,13 +82,18 @@ defmodule CyberSourceSDK.Client do
   @doc """
   Capture authorization on user credit card
   """
-  def capture(order_id, request_id, items \\ [], worker \\ :merchant) do
-    replace_params = get_configuration_params(worker)
-      ++ [request_id: request_id, reference_id: order_id]
-      ++ items
+  def capture(order_id, request_params, items \\ [], worker \\ :merchant) do
+    case Helper.json_from_base64(request_params) do
+      {:ok, %{request_id: request_id, request_token: _request_token}} ->
+        replace_params = get_configuration_params(worker)
+          ++ [request_id: request_id, reference_id: order_id]
+          ++ [items: items]
 
-    EEx.eval_file(get_template("capture_request.xml"), assigns: replace_params)
-    |> call
+        EEx.eval_file(get_template("capture_request.xml"), assigns: replace_params)
+        |> call
+
+      {:error, message} -> {:error, message}
+    end
   end
 
   @doc """
@@ -100,18 +105,19 @@ defmodule CyberSourceSDK.Client do
   refund("1234", 23435465442432, items)
   ```
   """
-  def refund(order_id, request_id, items \\ [], worker \\ :merchant) do
-    # TODO: might need request_token
-    replace_params = get_configuration_params(worker)
-      ++ [request_id: request_id, reference_id: order_id]
-      ++ items
+  def refund(order_id, amount, request_params, items \\ [], worker \\ :merchant) do
+    case Helper.json_from_base64(request_params) do
+      {:ok, %{request_id: request_id, request_token: _request_token}} ->
+        # TODO: might need request_token
+        replace_params = get_configuration_params(worker)
+          ++ [request_id: request_id, reference_id: order_id, total_amount: amount]
+          ++ [items: items]
 
-    EEx.eval_file(get_template("refund_request.xml"), assigns: replace_params)
-    |> call
+        EEx.eval_file(get_template("refund_request.xml"), assigns: replace_params)
+        |> call
 
-    #|> String.replace("\r", "")
-    #|> String.replace("\n", "")
-    #|> String.replace("\t", "")
+      {:error, message} -> {:error, message}
+    end
   end
 
   @doc """
@@ -172,18 +178,6 @@ defmodule CyberSourceSDK.Client do
     ]
   end
 
-  # Extract
-  defp json_from_base64(base64_string) do
-    case Base.decode64(base64_string) do
-      {:ok, json} ->
-        case Poison.Parser.parse(json) do
-          {:ok, json} -> {:ok, Helper.convert_map_to_key_atom(json)}
-          {:error, reason} -> {:error, reason}
-        end
-      _ -> {:error, :bad_base64_encoding}
-    end
-  end
-
   defp get_card_type(card_type) do
     case card_type do
       "VISA" -> "001"
@@ -200,7 +194,7 @@ defmodule CyberSourceSDK.Client do
 
     if (!is_nil(merchant_configuration)) do
       [
-        merchant_id: Map.get(merchant_configuration, :merchant_id),
+        merchant_id: Map.get(merchant_configuration, :id),
         transaction_key: Map.get(merchant_configuration, :transaction_key),
         currency: Map.get(merchant_configuration, :currency),
       ]
@@ -222,7 +216,7 @@ defmodule CyberSourceSDK.Client do
 
   defp validate_merchant_reference_code(merchant_reference_code) do
     cond do
-      String.valid?(merchant_reference_code) && length(merchant_reference_code) -> merchant_reference_code
+      String.valid?(merchant_reference_code) && String.length(merchant_reference_code) -> merchant_reference_code
       is_integer(merchant_reference_code) -> Integer.to_string(merchant_reference_code)
       true -> {:error, :invalid_order_id}
     end
@@ -234,7 +228,7 @@ defmodule CyberSourceSDK.Client do
   # {:ok, :apple_pay}
   # {:error, :not_found}
   defp check_payment_type(encrypted_payload) do
-    case json_from_base64(encrypted_payload) do
+    case Helper.json_from_base64(encrypted_payload) do
       {:ok, data} ->
         header = Map.get(data, :header)
         signature = Map.get(data, :signature)
@@ -270,8 +264,12 @@ defmodule CyberSourceSDK.Client do
       ],
       ccAuthReversalReply: [
         ~x".//c:ccAuthReversalReply"o,
-        reasonCode: ~x"./c:reasonCode/text()"i,
-        amount: ~x"./c:amount/text()"f
+        reasonCode: ~x"./c:reasonCode/text()"i
+      ],
+      originalTransaction: [
+        ~x".//c:originalTransaction"o,
+        amount: ~x"./c:amount/text()"f,
+        reasonCode: ~x"./c:reasonCode/text()"i
       ]
     )
   end
