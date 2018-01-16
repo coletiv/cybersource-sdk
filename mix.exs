@@ -9,7 +9,7 @@ defmodule CyberSourceSDK.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      package: [
-      contributors: ["David Magalhães"],
+      maintainers: ["David Magalhães"],
       licenses: ["MIT"],
       links: %{github: "https://github.com/coletiv/cybersource-sdk"}
      ],
