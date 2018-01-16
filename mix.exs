@@ -14,8 +14,13 @@ defmodule CyberSourceSDK.Mixfile do
       links: %{github: "https://github.com/coletiv/cybersource-sdk"}
      ],
      description: """
-     Non official library used to call WSDL SOAP Services of CyberSource.
-     """]
+     Non-official library used to call WSDL SOAP Services of CyberSource.
+     """,
+
+     # Docs
+     name: "CyberSource SDK",
+     source_url: "https://github.com/coletiv/cybersource-sdk"
+   ]
   end
 
   def application do

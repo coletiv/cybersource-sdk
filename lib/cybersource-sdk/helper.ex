@@ -1,6 +1,16 @@
 defmodule CyberSourceSDK.Helper do
+  @moduledoc """
+  Small utility functions
+  """
+
   @doc """
-  Convert a Map that have a list of strings
+  Convert a Map that have the keys as strings to atoms
+
+  ## Examples
+
+      iex> CyberSourceSDK.Helper.convert_map_to_key_atom(%{"a" => 3, "b" => 5})
+      %{a: 3, b: 5}
+
   """
   def convert_map_to_key_atom(string_key_map) when is_map(string_key_map) do
     for {key, val} <- string_key_map, into: %{}, do: {String.to_atom(key), convert_map_to_key_atom(val)}
@@ -23,7 +33,13 @@ defmodule CyberSourceSDK.Helper do
   end
 
   @doc """
-  Decode base64 string to JSON structure
+  Decode Base64 string to JSON structure
+
+  ## Examples
+
+      iex> CyberSourceSDK.Helper.json_from_base64("eyJhIjogMiwgImIiOiAzfQ==")
+      {:ok, %{a: 2, b: 3}}
+
   """
   def json_from_base64(base64_string) do
     case Base.decode64(base64_string) do

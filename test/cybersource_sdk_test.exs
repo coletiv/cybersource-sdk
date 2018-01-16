@@ -1,5 +1,7 @@
 defmodule CyberSourceSDKTest do
-	use ExUnit.Case
+	use ExUnit.Case, async: true
+	doctest CyberSourceSDK
+	doctest CyberSourceSDK.Helper
 
 	test "Test bill_to generated parameters" do
 		expected_parameters = [
