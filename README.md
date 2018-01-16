@@ -4,7 +4,7 @@ This module handle CyberSource SOAP service for payments. I've tried to use [Det
 
 This module only works for **Apple Pay** and **Android Pay**. Other systems will be added in the future.
 
-It only support 3 types of requests: Authorization, Capture and Refund.
+It only supports 3 types of requests: Authorization, Capture and Refund.
 
 ## Usage
 
@@ -78,7 +78,7 @@ After this, you need to send the `worker` merchant atom to the request.
 
 ### Authorization
 
-Check credit card funds, and hold the payment of the transaction until a capture or refund request is issue.
+Check credit card funds, and hold the payment of the transaction until a capture or refund request is issued.
 
 **Example**
 ```
@@ -88,7 +88,7 @@ CyberSourceSDK.authorize(50, bill_to, "VISA", "3a9KSs98jDSAMsandsab8DSA+dk==", [
 
 ### Capture
 
-Complete the authorization request by finishing it with the capture request. All the funds of this transaction will be available in your account and charge to the user.
+Complete the authorization request by finishing it with the capture request. All the funds of this transaction will be available in your account and charged to the user.
 
 **Example**
 ```
