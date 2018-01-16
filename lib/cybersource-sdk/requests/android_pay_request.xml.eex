@@ -1,0 +1,39 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+ <soapenv:Header>
+	<Security xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+    <UsernameToken>
+      <Username><%= @merchant_id %></Username>
+      <Password><%= @transaction_key %></Password>
+    </UsernameToken>
+  </Security>
+ </soapenv:Header>
+ <soapenv:Body>
+	<requestMessage xmlns="urn:schemas-cybersource-com:transaction-data-1.121">
+		<merchantID><%= @merchant_id %></merchantID>
+		<merchantReferenceCode><%= @reference_id %></merchantReferenceCode>
+    <%= if assigns[:first_name] do %>
+		<billTo>
+			<firstName><%= @first_name %></firstName>
+			<lastName><%= @last_name %></lastName>
+			<street1><%= @street1 %></street1>
+			<street2><%= @street2 %></street2>
+			<city><%= @city %></city>
+			<country><%= @country %></country>
+			<email><%= @email %></email>
+		</billTo>
+    <% end %>
+		<purchaseTotals>
+			<currency><%= @currency %></currency>
+			<grandTotalAmount><%= @total_amount %></grandTotalAmount>
+		</purchaseTotals>
+		<encryptedPayment>
+			<data><%= @encrypted_payment_data %></data>
+		</encryptedPayment>
+		<card>
+			<cardType><%= @card_type %></cardType>
+		</card>
+		<ccAuthService run="true" />
+		<paymentSolution>006</paymentSolution>
+	</requestMessage>
+ </soapenv:Body>
+</soapenv:Envelope>
