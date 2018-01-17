@@ -51,4 +51,30 @@ defmodule CyberSourceSDK.Helper do
       _ -> {:error, :bad_base64_encoding}
     end
   end
+
+  @doc """
+  Check what type of payment is: Android Pay or Apple Pay
+
+  ## Results
+
+  - `{:ok, :android_pay}`
+  - `{:ok, :apple_pay}`
+  - `{:error, :not_found}`
+  """
+  def check_payment_type(encrypted_payload) do
+    case json_from_base64(encrypted_payload) do
+      {:ok, data} ->
+        header = Map.get(data, :header)
+        signature = Map.get(data, :signature)
+        publicKeyHash = Map.get(data, :publicKeyHash)
+
+        cond do
+          !is_nil(header) && !is_nil(signature) -> {:ok, :apple_pay}
+          !is_nil(publicKeyHash) -> {:ok, :android_pay}
+          true -> {:ok, :not_found_payment_type}
+        end
+
+      {:error, _reason} -> {:error, :invalid_base64_or_json}
+    end
+  end
 end

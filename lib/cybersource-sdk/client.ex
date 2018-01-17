@@ -62,7 +62,7 @@ defmodule CyberSourceSDK.Client do
         {:error, reason}
 
       merchant_reference_code_validated ->
-        case check_payment_type(encrypted_payment) do
+        case Helper.check_payment_type(encrypted_payment) do
           {:ok, :apple_pay} ->
             pay_with_apple_pay(price, merchant_reference_code_validated, card_type, encrypted_payment, bill_to, worker)
 
@@ -240,28 +240,6 @@ defmodule CyberSourceSDK.Client do
       String.valid?(merchant_reference_code) && String.length(merchant_reference_code) -> merchant_reference_code
       is_integer(merchant_reference_code) -> Integer.to_string(merchant_reference_code)
       true -> {:error, :invalid_order_id}
-    end
-  end
-
-  # Internal function to check what type of payment is:
-  #
-  # {:ok, :android_pay}
-  # {:ok, :apple_pay}
-  # {:error, :not_found}
-  defp check_payment_type(encrypted_payload) do
-    case Helper.json_from_base64(encrypted_payload) do
-      {:ok, data} ->
-        header = Map.get(data, :header)
-        signature = Map.get(data, :signature)
-        publicKeyHash = Map.get(data, :publicKeyHash)
-
-        cond do
-          !is_nil(header) && !is_nil(signature) -> {:ok, :apple_pay}
-          !is_nil(publicKeyHash) -> {:ok, :android_pay}
-          true -> {:ok, :not_found_payment_type}
-        end
-
-      {:error, _reason} -> {:error, :invalid_base64_or_json}
     end
   end
 
