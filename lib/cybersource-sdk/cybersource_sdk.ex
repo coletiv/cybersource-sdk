@@ -59,8 +59,8 @@ defmodule CyberSourceSDK do
   @doc """
   Pay with Apple Pay request
   """
-  def pay_with_apple_pay(price, merchant_reference_code, card_type, encrypted_payment, request_id, bill_to \\ [], worker \\ :merchant) do
-    CyberSourceSDK.Client.pay_with_apple_pay(price, merchant_reference_code, card_type, encrypted_payment, request_id, bill_to, worker)
+  def pay_with_apple_pay(price, merchant_reference_code, card_type, encrypted_payment, bill_to \\ [], worker \\ :merchant) do
+    CyberSourceSDK.Client.pay_with_apple_pay(price, merchant_reference_code, card_type, encrypted_payment, bill_to, worker)
   end
 
   @doc """

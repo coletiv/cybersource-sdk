@@ -77,4 +77,11 @@ defmodule CyberSourceSDK.Helper do
       {:error, _reason} -> {:error, :invalid_base64_or_json}
     end
   end
+
+  @doc """
+  Invalid configuration message error
+  """
+  def invalid_merchant_configuration() do
+    {:error, "Invalid merchant configuration"}
+  end
 end
