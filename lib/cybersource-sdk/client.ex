@@ -20,7 +20,7 @@ defmodule CyberSourceSDK.Client do
   use GenServer
 
   def start_link do
-    GenServer.start_link(__MODULE__, {}, [name: :cybersource_sdk_client])
+    GenServer.start_link(__MODULE__, {}, name: :cybersource_sdk_client)
   end
 
   @doc """
@@ -54,9 +54,17 @@ defmodule CyberSourceSDK.Client do
   ```
 
   """
-  def authorize(price, merchant_reference_code, card_type, encrypted_payment, bill_to \\ [], worker \\ :merchant)
+  def authorize(
+        price,
+        merchant_reference_code,
+        card_type,
+        encrypted_payment,
+        bill_to \\ [],
+        worker \\ :merchant
+      )
 
-  def authorize(price, merchant_reference_code, card_type, encrypted_payment, bill_to, worker) when is_float(price) do
+  def authorize(price, merchant_reference_code, card_type, encrypted_payment, bill_to, worker)
+      when is_float(price) do
     case validate_merchant_reference_code(merchant_reference_code) do
       {:error, reason} ->
         {:error, reason}
@@ -64,10 +72,24 @@ defmodule CyberSourceSDK.Client do
       merchant_reference_code_validated ->
         case Helper.check_payment_type(encrypted_payment) do
           {:ok, :apple_pay} ->
-            pay_with_apple_pay(price, merchant_reference_code_validated, card_type, encrypted_payment, bill_to, worker)
+            pay_with_apple_pay(
+              price,
+              merchant_reference_code_validated,
+              card_type,
+              encrypted_payment,
+              bill_to,
+              worker
+            )
 
           {:ok, :android_pay} ->
-            pay_with_android_pay(price, merchant_reference_code_validated, card_type, encrypted_payment, bill_to, worker)
+            pay_with_android_pay(
+              price,
+              merchant_reference_code_validated,
+              card_type,
+              encrypted_payment,
+              bill_to,
+              worker
+            )
 
           {:error, reason} ->
             {:error, reason}
@@ -99,14 +121,21 @@ defmodule CyberSourceSDK.Client do
   def capture(order_id, request_params, items \\ [], worker \\ :merchant) do
     case Helper.json_from_base64(request_params) do
       {:ok, %{request_id: request_id, request_token: _request_token}} ->
-        replace_params = get_configuration_params(worker)
-          ++ [request_id: request_id, reference_id: order_id]
-          ++ [items: items]
+        merchant_configuration = get_configuration_params(worker)
 
-        EEx.eval_file(get_template("capture_request.xml"), assigns: replace_params)
-        |> call
+        if length(merchant_configuration) > 0 do
+          replace_params =
+            get_configuration_params(worker) ++
+              [request_id: request_id, reference_id: order_id] ++ [items: items]
 
-      {:error, message} -> {:error, message}
+          EEx.eval_file(get_template("capture_request.xml"), assigns: replace_params)
+          |> call
+        else
+          Helper.invalid_merchant_configuration()
+        end
+
+      {:error, message} ->
+        {:error, message}
     end
   end
 
@@ -130,14 +159,22 @@ defmodule CyberSourceSDK.Client do
   def refund(order_id, amount, request_params, items \\ [], worker \\ :merchant) do
     case Helper.json_from_base64(request_params) do
       {:ok, %{request_id: request_id, request_token: _request_token}} ->
-        replace_params = get_configuration_params(worker)
-          ++ [request_id: request_id, reference_id: order_id, total_amount: amount]
-          ++ [items: items]
+        merchant_configuration = get_configuration_params(worker)
 
-        EEx.eval_file(get_template("refund_request.xml"), assigns: replace_params)
-        |> call
+        if length(merchant_configuration) > 0 do
+          replace_params =
+            get_configuration_params(worker) ++
+              [request_id: request_id, reference_id: order_id, total_amount: amount] ++
+              [items: items]
 
-      {:error, message} -> {:error, message}
+          EEx.eval_file(get_template("refund_request.xml"), assigns: replace_params)
+          |> call
+        else
+          Helper.invalid_merchant_configuration()
+        end
+
+      {:error, message} ->
+        {:error, message}
     end
   end
 
@@ -147,18 +184,32 @@ defmodule CyberSourceSDK.Client do
   Returns `{:ok, response_object}` , `{:error, :card_type_not_found` or
    `{:error, response_code}`
   """
-  def pay_with_android_pay(price, merchant_reference_code, card_type, encrypted_payment, bill_to \\ [], worker \\ :merchant) do
+  def pay_with_android_pay(
+        price,
+        merchant_reference_code,
+        card_type,
+        encrypted_payment,
+        bill_to \\ [],
+        worker \\ :merchant
+      ) do
     case get_card_type(card_type) do
       nil ->
         {:error, :card_type_not_found}
 
       card_type ->
-        replace_params = get_configuration_params(worker)
-        ++ get_payment_params(merchant_reference_code, price, encrypted_payment, card_type)
-        ++ bill_to
+        merchant_configuration = get_configuration_params(worker)
 
-        EEx.eval_file(get_template("android_pay_request.xml"), assigns: replace_params)
-        |> call
+        if length(merchant_configuration) > 0 do
+          replace_params =
+            get_configuration_params(worker) ++
+              get_payment_params(merchant_reference_code, price, encrypted_payment, card_type) ++
+              bill_to
+
+          EEx.eval_file(get_template("android_pay_request.xml"), assigns: replace_params)
+          |> call
+        else
+          Helper.invalid_merchant_configuration()
+        end
     end
   end
 
@@ -168,19 +219,36 @@ defmodule CyberSourceSDK.Client do
   Returns `{:ok, response_object}` , `{:error, :card_type_not_found` or
    `{:error, response_code}`
   """
-  def pay_with_apple_pay(price, merchant_reference_code, card_type, encrypted_payment, request_id, bill_to \\ [], worker \\ :merchant) do
+  def pay_with_apple_pay(
+        price,
+        merchant_reference_code,
+        card_type,
+        encrypted_payment,
+        bill_to \\ [],
+        worker \\ :merchant
+      ) do
     case get_card_type(card_type) do
-        nil ->
-          {:error, :card_type_not_found}
+      nil ->
+        {:error, :card_type_not_found}
 
-        card_type ->
-          replace_params = get_configuration_params(worker)
-          ++ get_payment_params(merchant_reference_code, price, encrypted_payment, card_type)
-          ++ [request_id: request_id]
-          ++ bill_to
+      card_type ->
+        merchant_configuration = get_configuration_params(worker)
+
+        if length(merchant_configuration) > 0 do
+          replace_params =
+            CyberSourceSDK.Client.get_configuration_params(worker) ++
+              CyberSourceSDK.Client.get_payment_params(
+                merchant_reference_code,
+                price,
+                encrypted_payment,
+                card_type
+              ) ++ bill_to
 
           EEx.eval_file(get_template("apple_pay_request.xml"), assigns: replace_params)
           |> call()
+        else
+          Helper.invalid_merchant_configuration()
+        end
     end
   end
 
@@ -190,7 +258,7 @@ defmodule CyberSourceSDK.Client do
   end
 
   # Get Payment parameters
-  defp get_payment_params(order_id, price, encrypted_token, card_type) do
+  def get_payment_params(order_id, price, encrypted_token, card_type) do
     [
       reference_id: order_id,
       total_amount: price,
@@ -203,21 +271,21 @@ defmodule CyberSourceSDK.Client do
     case card_type do
       "VISA" -> "001"
       "MASTERCARD" -> "002"
-      "AMERICAN EXPRESS" -> "003"
+      "AMEX" -> "003"
       "DISCOVER" -> "004"
       "JCB" -> nil
       _ -> nil
     end
   end
 
-  defp get_configuration_params(worker) do
+  def get_configuration_params(worker) do
     merchant_configuration = Application.get_env(:cybersource_sdk, worker)
 
-    if (!is_nil(merchant_configuration)) do
+    if !is_nil(merchant_configuration) do
       [
         merchant_id: Map.get(merchant_configuration, :id),
         transaction_key: Map.get(merchant_configuration, :transaction_key),
-        currency: Map.get(merchant_configuration, :currency),
+        currency: Map.get(merchant_configuration, :currency)
       ]
     else
       []
@@ -228,25 +296,35 @@ defmodule CyberSourceSDK.Client do
   defp call(xml_body) do
     endpoint = Application.get_env(:cybersource_sdk, :endpoint)
 
-    # TODO: Check errors
-    {:ok,  %HTTPoison.Response{body: response_body}} = HTTPoison.post endpoint, xml_body, [{"Content-Type", "application/xml"}]
+    case HTTPoison.post(endpoint, xml_body, [{"Content-Type", "application/xml"}]) do
+      {:ok, %HTTPoison.Response{body: response_body}} ->
+        parse_response(response_body)
+        |> handle_response
 
-    parse_response(response_body)
-    |> handle_response
+      {:error, %HTTPoison.Error{id: _, reason: reason}} ->
+        {:error, reason}
+    end
   end
 
   defp validate_merchant_reference_code(merchant_reference_code) do
     cond do
-      String.valid?(merchant_reference_code) && String.length(merchant_reference_code) -> merchant_reference_code
-      is_integer(merchant_reference_code) -> Integer.to_string(merchant_reference_code)
-      true -> {:error, :invalid_order_id}
+      String.valid?(merchant_reference_code) && String.length(merchant_reference_code) ->
+        merchant_reference_code
+
+      is_integer(merchant_reference_code) ->
+        Integer.to_string(merchant_reference_code)
+
+      true ->
+        {:error, :invalid_order_id}
     end
   end
 
   # Parse response from CyberSource
   defp parse_response(xml) do
-    xml |> xmap(
-      merchantReferenceCode: ~x"//soap:Envelope/soap:Body/c:replyMessage/c:merchantReferenceCode/text()"s,
+    xml
+    |> xmap(
+      merchantReferenceCode:
+        ~x"//soap:Envelope/soap:Body/c:replyMessage/c:merchantReferenceCode/text()"s,
       requestID: ~x"//soap:Envelope/soap:Body/c:replyMessage/c:requestID/text()"i,
       decision: ~x"//soap:Envelope/soap:Body/c:replyMessage/c:decision/text()"s,
       reasonCode: ~x"//soap:Envelope/soap:Body/c:replyMessage/c:reasonCode/text()"i,
