@@ -1,4 +1,6 @@
-# cybersource-sdk
+# Cybersource SDK
+
+[![Build Status](https://travis-ci.org/coletiv/cybersource-sdk.svg?branch=master)](https://travis-ci.org/coletiv/cybersource-sdk)
 
 This module handle CyberSource SOAP service for payments. I've tried to use [Detergentx](https://github.com/r-icarus/detergentex) Elixir wrapper to erlang module detergent without success. Also tried [Bet365 soap](https://github.com/bet365/soap/) module, with no luck.
 
