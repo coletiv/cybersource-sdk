@@ -332,12 +332,12 @@ defmodule CyberSourceSDK.Client do
       ccAuthReply: [
         ~x".//c:ccAuthReply"o,
         reasonCode: ~x"./c:reasonCode/text()"i,
-        amount: ~x"./c:amount/text()"f
+        amount: ~x"./c:amount/text()"of
       ],
       ccCapctureReply: [
         ~x".//c:ccCapctureReply"o,
         reasonCode: ~x"./c:reasonCode/text()"i,
-        amount: ~x"./c:amount/text()"f
+        amount: ~x"./c:amount/text()"of
       ],
       ccAuthReversalReply: [
         ~x".//c:ccAuthReversalReply"o,
@@ -345,7 +345,7 @@ defmodule CyberSourceSDK.Client do
       ],
       originalTransaction: [
         ~x".//c:originalTransaction"o,
-        amount: ~x"./c:amount/text()"f,
+        amount: ~x"./c:amount/text()"of,
         reasonCode: ~x"./c:reasonCode/text()"i
       ]
     )
