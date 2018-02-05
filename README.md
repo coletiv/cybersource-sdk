@@ -1,4 +1,7 @@
-# cybersource-sdk
+# Cybersource SDK
+
+[![Build Status](https://travis-ci.org/coletiv/cybersource-sdk.svg?branch=master)](https://travis-ci.org/coletiv/cybersource-sdk)
+[![Hex.pm Version](http://img.shields.io/hexpm/v/cybersource_sdk.svg)](https://hex.pm/packages/cybersource_sdk)
 
 This module handle CyberSource SOAP service for payments. I've tried to use [Detergentx](https://github.com/r-icarus/detergentex) Elixir wrapper to erlang module detergent without success. Also tried [Bet365 soap](https://github.com/bet365/soap/) module, with no luck.
 
@@ -13,7 +16,7 @@ It only supports 3 types of requests: Authorization, Capture and Refund.
 ```
 [
   ...
-  {:cybersource_sdk, github: "coletiv/cybersource-sdk"},
+  {:cybersource_sdk, "~> 0.0.3"},
   ...
 ]
 ```
@@ -71,8 +74,6 @@ config :cybersource_sdk,
 ```
 
 After this, you need to send the `worker` merchant atom to the request.
-
-``
 
 ## Requests
 
