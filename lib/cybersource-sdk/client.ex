@@ -355,6 +355,7 @@ defmodule CyberSourceSDK.Client do
     case response.decision do
       "ACCEPT" -> {:ok, response}
       "REJECT" -> {:error, response.reasonCode}
+      "ERROR" -> {:error, response.reasonCode}
     end
   end
 end
