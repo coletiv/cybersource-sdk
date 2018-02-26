@@ -16,7 +16,7 @@ It only supports 3 types of requests: Authorization, Capture and Refund.
 ```
 [
   ...
-  {:cybersource_sdk, "~> 0.0.3"},
+  {:cybersource_sdk, "~> 0.0.5"},
   ...
 ]
 ```
