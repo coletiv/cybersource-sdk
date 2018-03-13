@@ -334,10 +334,12 @@ defmodule CyberSourceSDK.Client do
         reasonCode: ~x"./c:reasonCode/text()"i,
         amount: ~x"./c:amount/text()"of
       ],
-      ccCapctureReply: [
+      ccCaptureReply: [
         ~x".//c:ccCapctureReply"o,
         reasonCode: ~x"./c:reasonCode/text()"i,
-        amount: ~x"./c:amount/text()"of
+        amount: ~x"./c:amount/text()"of,
+        requestDateTime: ~x"./c:requestDateTime/text()"so,
+        reconciliationID: ~x"./c:reconciliationID/text()"io
       ],
       ccAuthReversalReply: [
         ~x".//c:ccAuthReversalReply"o,

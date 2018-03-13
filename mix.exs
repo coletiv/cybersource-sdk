@@ -3,7 +3,7 @@ defmodule CyberSourceSDK.Mixfile do
 
   def project do
     [app: :cybersource_sdk,
-     version: "0.0.6",
+     version: "0.0.7",
      elixir: "~> 1.2",
      deps: deps(),
      build_embedded: Mix.env == :prod,
