@@ -335,7 +335,7 @@ defmodule CyberSourceSDK.Client do
         amount: ~x"./c:amount/text()"of
       ],
       ccCaptureReply: [
-        ~x".//c:ccCapctureReply"o,
+        ~x".//c:ccCaptureReply"o,
         reasonCode: ~x"./c:reasonCode/text()"i,
         amount: ~x"./c:amount/text()"of,
         requestDateTime: ~x"./c:requestDateTime/text()"so,
