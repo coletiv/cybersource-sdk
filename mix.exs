@@ -3,7 +3,7 @@ defmodule CyberSourceSDK.Mixfile do
 
   def project do
     [app: :cybersource_sdk,
-     version: "0.0.8",
+     version: "1.0.0",
      elixir: "~> 1.2",
      deps: deps(),
      build_embedded: Mix.env == :prod,
@@ -42,7 +42,8 @@ defmodule CyberSourceSDK.Mixfile do
     	{:sweet_xml, "~> 0.6"},
     	{:httpoison, "~> 0.11"},
       {:poison, "~> 2.0"},
-      {:ex_doc, "~> 0.18", only: :dev}
+      {:ex_doc, "~> 0.18", only: :dev},
+      {:bypass, "~> 0.6", only: :test}
     ]
   end
 end
