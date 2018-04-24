@@ -16,7 +16,7 @@ It only supports 3 types of requests: Authorization, Capture and Refund.
 ```
 [
   ...
-  {:cybersource_sdk, "~> 0.0.7"},
+  {:cybersource_sdk, "~> 1.0.0"},
   ...
 ]
 ```
@@ -142,5 +142,9 @@ ccCapctureReply: [
 ccAuthReversalReply: [
   reasonCode: ...,
   amount: ...
+],
+fault: [
+  faultCode: ...,
+  faultString: ...
 ]
 ```

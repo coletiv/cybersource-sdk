@@ -19,6 +19,10 @@ defmodule CyberSourceSDK.Client do
 
   use GenServer
 
+  def init(args) do
+    {:ok, args}
+  end
+
   def start_link do
     GenServer.start_link(__MODULE__, {}, name: :cybersource_sdk_client)
   end
@@ -320,15 +324,15 @@ defmodule CyberSourceSDK.Client do
   end
 
   # Parse response from CyberSource
-  defp parse_response(xml) do
+  def parse_response(xml) do
     xml
     |> xmap(
       merchantReferenceCode:
-        ~x"//soap:Envelope/soap:Body/c:replyMessage/c:merchantReferenceCode/text()"s,
-      requestID: ~x"//soap:Envelope/soap:Body/c:replyMessage/c:requestID/text()"i,
-      decision: ~x"//soap:Envelope/soap:Body/c:replyMessage/c:decision/text()"s,
-      reasonCode: ~x"//soap:Envelope/soap:Body/c:replyMessage/c:reasonCode/text()"i,
-      requestToken: ~x"//soap:Envelope/soap:Body/c:replyMessage/c:requestToken/text()"s,
+        ~x"//soap:Envelope/soap:Body/c:replyMessage/c:merchantReferenceCode/text()"os,
+      requestID: ~x"//soap:Envelope/soap:Body/c:replyMessage/c:requestID/text()"oi,
+      decision: ~x"//soap:Envelope/soap:Body/c:replyMessage/c:decision/text()"os,
+      reasonCode: ~x"//soap:Envelope/soap:Body/c:replyMessage/c:reasonCode/text()"oi,
+      requestToken: ~x"//soap:Envelope/soap:Body/c:replyMessage/c:requestToken/text()"os,
       ccAuthReply: [
         ~x".//c:ccAuthReply"o,
         reasonCode: ~x"./c:reasonCode/text()"i,
@@ -349,15 +353,29 @@ defmodule CyberSourceSDK.Client do
         ~x".//c:originalTransaction"o,
         amount: ~x"./c:amount/text()"of,
         reasonCode: ~x"./c:reasonCode/text()"i
+      ],
+      fault: [
+        ~x"//soap:Envelope/soap:Body/soap:Fault"o,
+        faultCode: ~x"./faultcode/text()"s,
+        faultString: ~x"./faultstring/text()"s,
       ]
     )
   end
 
   defp handle_response(response) do
-    case response.decision do
-      "ACCEPT" -> {:ok, response}
-      "REJECT" -> {:error, response.reasonCode}
-      "ERROR" -> {:error, response.reasonCode}
+    cond do
+      response.decision != "" ->
+        case response.decision do
+          "ACCEPT" -> {:ok, response}
+          "REJECT" -> {:error, response.reasonCode}
+          "ERROR" -> {:error, response.reasonCode}
+        end
+
+      response.fault.faultCode != "" ->
+        {:error, "#{response.fault.faultCode} - #{response.fault.faultString}"}
+
+      true ->
+        {:error, :unknown_response}
     end
   end
 end
