@@ -1,0 +1,23 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/">
+ <soapenv:Header>
+	<Security xmlns="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+    <UsernameToken>
+      <Username><%= @merchant_id %></Username>
+      <Password><%= @transaction_key %></Password>
+    </UsernameToken>
+  </Security>
+ </soapenv:Header>
+ <soapenv:Body>
+	<requestMessage xmlns="urn:schemas-cybersource-com:transaction-data-1.121">
+		<merchantID><%= @merchant_id %></merchantID>
+		<merchantReferenceCode><%= @reference_id %></merchantReferenceCode>
+    <purchaseTotals>
+			<currency><%= @currency %></currency>
+			<grandTotalAmount><%= @total_amount %></grandTotalAmount>
+		</purchaseTotals>
+		<ccCreditService run="true">
+      <captureRequestID><%= @request_id %></captureRequestID>
+    </ccCreditService>
+	</requestMessage>
+ </soapenv:Body>
+</soapenv:Envelope>
