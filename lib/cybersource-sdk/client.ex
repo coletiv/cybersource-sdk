@@ -350,7 +350,8 @@ defmodule CyberSourceSDK.Client do
       [
         merchant_id: Map.get(merchant_configuration, :id),
         transaction_key: Map.get(merchant_configuration, :transaction_key),
-        currency: Map.get(merchant_configuration, :currency)
+        currency: Map.get(merchant_configuration, :currency),
+        client_library: "CyberSourceSDK Elixir #{Application.spec(:cybersource_sdk, :vsn)}"
       ]
     else
       []

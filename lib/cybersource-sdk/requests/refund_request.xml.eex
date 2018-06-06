@@ -11,6 +11,7 @@
 	<requestMessage xmlns="urn:schemas-cybersource-com:transaction-data-1.121">
 		<merchantID><%= @merchant_id %></merchantID>
 		<merchantReferenceCode><%= @reference_id %></merchantReferenceCode>
+    <clientLibrary><%= @client_library %></clientLibrary>
     <%= for %{id: id, unit_price: unit_price, quantity: quantity} <- @items do %>
     <item id="<%= id %>">
       <unitPrice><%= unit_price %></unitPrice>
