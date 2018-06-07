@@ -11,6 +11,7 @@
 	<requestMessage xmlns="urn:schemas-cybersource-com:transaction-data-1.121">
 		<merchantID><%= @merchant_id %></merchantID>
 		<merchantReferenceCode><%= @reference_id %></merchantReferenceCode>
+    <clientLibrary><%= @client_library %></clientLibrary>
     <%= if assigns[:first_name] do %>
 		<billTo>
       <firstName><%= @first_name %></firstName>

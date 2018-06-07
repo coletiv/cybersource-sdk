@@ -4,5 +4,8 @@ elixir:
 env:
   matrix:
   - MIX_ENV=test
+branches:
+  only:
+  - master
 script:
 - mix test

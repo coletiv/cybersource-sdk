@@ -183,6 +183,67 @@ defmodule CyberSourceSDK.Client do
   end
 
   @doc """
+  A void cancels a capture or credit request that you submitted to CyberSource. A
+  transaction can be voided only when CyberSource has not already submitted the capture
+  or credit request to your processor. CyberSource usually submits capture and credit
+  requests to your processor once a day, so your window for successfully voiding a capture
+  or credit request is small. CyberSource declines your void request when the capture or
+  credit request has already been sent to the processor
+  """
+  def void(order_id, request_params, worker \\ :merchant) do
+    case Helper.json_from_base64(request_params) do
+      {:ok, %{request_id: request_id, request_token: _request_token}} ->
+        merchant_configuration = get_configuration_params(worker)
+
+        if length(merchant_configuration) > 0 do
+          replace_params =
+            get_configuration_params(worker) ++
+              [request_id: request_id, reference_id: order_id]
+
+          EEx.eval_file(get_template("void_request.xml"), assigns: replace_params)
+          |> call
+        else
+          Helper.invalid_merchant_configuration()
+        end
+
+      {:error, message} ->
+        {:error, message}
+    end
+  end
+
+  @doc """
+  When your request for a credit is successful, the issuing bank for the credit
+  card takes money out of your merchant bank account and returns it to the customer.
+  It usually takes two to four days for your acquiring bank to transfer funds
+  from your merchant bank account.
+  """
+  def credit(order_id, amount, reason, request_params, worker \\ :merchant) do
+    case Helper.json_from_base64(request_params) do
+      {:ok, %{request_id: request_id, request_token: _request_token}} ->
+        merchant_configuration = get_configuration_params(worker)
+
+        if length(merchant_configuration) > 0 do
+          replace_params =
+            get_configuration_params(worker) ++
+              [
+                request_id: request_id,
+                reference_id: order_id,
+                total_amount: amount,
+                refund_reason: reason
+              ]
+
+          EEx.eval_file(get_template("credit_request.xml"), assigns: replace_params)
+          |> call
+        else
+          Helper.invalid_merchant_configuration()
+        end
+
+      {:error, message} ->
+        {:error, message}
+    end
+  end
+
+  @doc """
   Make a request to pay with Android Pay
 
   Returns `{:ok, response_object}` , `{:error, :card_type_not_found` or
@@ -289,7 +350,8 @@ defmodule CyberSourceSDK.Client do
       [
         merchant_id: Map.get(merchant_configuration, :id),
         transaction_key: Map.get(merchant_configuration, :transaction_key),
-        currency: Map.get(merchant_configuration, :currency)
+        currency: Map.get(merchant_configuration, :currency),
+        client_library: "CyberSourceSDK Elixir #{Application.spec(:cybersource_sdk, :vsn)}"
       ]
     else
       []
@@ -353,6 +415,26 @@ defmodule CyberSourceSDK.Client do
         ~x".//c:originalTransaction"o,
         amount: ~x"./c:amount/text()"of,
         reasonCode: ~x"./c:reasonCode/text()"i
+      ],
+      voidReply: [
+        ~x".//c:voidReply"o,
+        reasonCode: ~x"./c:reasonCode/text()"i,
+        amount: ~x"./c:amount/text()"of,
+        requestDateTime: ~x"./c:requestDateTime/text()"so,
+        currency: ~x"./c:currency/text()"io
+      ],
+      ccCreditReply: [
+        ~x".//c:ccCreditReply"o,
+        reasonCode: ~x"./c:reasonCode/text()"i,
+        requestDateTime: ~x"./c:requestDateTime/text()"so,
+        amount: ~x"./c:amount/text()"of,
+        reconciliationID: ~x"./c:reconciliationID/text()"so,
+        purchasingLevel3Enabled: ~x"./c:purchasingLevel3Enabled/text()"so,
+        enhancedDataEnabled: ~x"./c:enhancedDataEnabled/text()"so,
+        authorizationXID: ~x"./c:authorizationXID/text()"so,
+        forwardCode: ~x"./c:forwardCode/text()"so,
+        ownerMerchantID: ~x"./c:ownerMerchantID/text()"so,
+        reconciliationReferenceNumber: ~x"./c:reconciliationReferenceNumber/text()"so
       ],
       fault: [
         ~x"//soap:Envelope/soap:Body/soap:Fault"o,

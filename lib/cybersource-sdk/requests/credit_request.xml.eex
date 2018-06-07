@@ -12,29 +12,13 @@
 		<merchantID><%= @merchant_id %></merchantID>
 		<merchantReferenceCode><%= @reference_id %></merchantReferenceCode>
     <clientLibrary><%= @client_library %></clientLibrary>
-    <%= if assigns[:first_name] do %>
-		<billTo>
-			<firstName><%= @first_name %></firstName>
-			<lastName><%= @last_name %></lastName>
-			<street1><%= @street1 %></street1>
-			<street2><%= @street2 %></street2>
-			<city><%= @city %></city>
-			<country><%= @country %></country>
-			<email><%= @email %></email>
-		</billTo>
-    <% end %>
-		<purchaseTotals>
+    <purchaseTotals>
 			<currency><%= @currency %></currency>
 			<grandTotalAmount><%= @total_amount %></grandTotalAmount>
 		</purchaseTotals>
-		<encryptedPayment>
-			<data><%= @encrypted_payment_data %></data>
-		</encryptedPayment>
-		<card>
-			<cardType><%= @card_type %></cardType>
-		</card>
-		<ccAuthService run="true" />
-		<paymentSolution>006</paymentSolution>
+		<ccCreditService run="true">
+      <captureRequestID><%= @request_id %></captureRequestID>
+    </ccCreditService>
 	</requestMessage>
  </soapenv:Body>
 </soapenv:Envelope>
