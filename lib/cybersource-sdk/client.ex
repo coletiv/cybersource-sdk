@@ -11,6 +11,10 @@ defmodule CyberSourceSDK.Client do
   * Authorization
   * Capture
   * Refund
+
+  More information:
+  - Token Management System: http://apps.cybersource.com/library/documentation/dev_guides/Token_Management/SO_API/TMS_SO_API.pdf
+  - Payment Tokenization: https://www.cybersource.com/content/dam/cybersource/Payment_Tokenization_SO_API.pdf
   """
 
   import SweetXml
@@ -197,8 +201,7 @@ defmodule CyberSourceSDK.Client do
 
         if length(merchant_configuration) > 0 do
           replace_params =
-            get_configuration_params(worker) ++
-              [request_id: request_id, reference_id: order_id]
+            get_configuration_params(worker) ++ [request_id: request_id, reference_id: order_id]
 
           EEx.eval_file(get_template("void_request.xml"), assigns: replace_params)
           |> call
@@ -317,6 +320,40 @@ defmodule CyberSourceSDK.Client do
     end
   end
 
+  #
+  # Token Management Service (TMS)
+  #
+  # Payment tokens are unique identifiers that replace sensitive card information and that
+  # cannot be mathematically reversed. CyberSource securely stores all the card information,
+  # replacing it with the payment token. The token is also known as a subscription ID, which
+  # you store on your server.
+  #
+
+  def create_token(reference_id, worker \\ :merchant) do
+    replace_params = get_configuration_params(worker) ++ [reference_id: reference_id]
+
+    EEx.eval_file(get_template("create_token.xml"), assigns: replace_params)
+    |> call
+  end
+
+  def get_token(subscription_id, reference_id, worker \\ :merchant) do
+    replace_params =
+      get_configuration_params(worker) ++
+        [reference_id: reference_id, subscription_id: subscription_id]
+
+    EEx.eval_file(get_template("get_token.xml"), assigns: replace_params)
+    |> call
+  end
+
+  def delete_token(subscription_id, reference_id \\ "no_reference_id", worker \\ :merchant) do
+    replace_params =
+      get_configuration_params(worker) ++
+        [reference_id: reference_id, subscription_id: subscription_id]
+
+    EEx.eval_file(get_template("delete_token.xml"), assigns: replace_params)
+    |> call
+  end
+
   # Define path of request templates
   defp get_template(filename) do
     Path.join(__DIR__, "/requests/" <> filename <> ".eex")
@@ -338,7 +375,19 @@ defmodule CyberSourceSDK.Client do
       "MASTERCARD" -> "002"
       "AMEX" -> "003"
       "DISCOVER" -> "004"
-      "JCB" -> nil
+      "DINERSCLUB" -> "005"
+      "CARTEBLANCHE" -> "006"
+      "JCB" -> "007"
+      "ENROUTE" -> "014"
+      "JAL" -> "021"
+      "MAESTRO" -> "024"
+      "DELTA" -> "031"
+      "DANKORT" -> "034"
+      "UATP" -> "040"
+      "HIPERCARD" -> "050"
+      "AURA" -> "051"
+      "ORICO" -> "053"
+      "ELO" -> "054"
       _ -> nil
     end
   end
@@ -436,10 +485,39 @@ defmodule CyberSourceSDK.Client do
         ownerMerchantID: ~x"./c:ownerMerchantID/text()"so,
         reconciliationReferenceNumber: ~x"./c:reconciliationReferenceNumber/text()"so
       ],
+      paySubscriptionRetrieveReply: [
+        ~x".//c:paySubscriptionRetrieveReply"o,
+        instrumentIdentifierStatus: ~x"./c:instrumentIdentifierStatus/text()"so,
+        instrumentIdentifierID: ~x"./c:instrumentIdentifierID/text()"io,
+        cardAccountNumber: ~x"./c:cardAccountNumber/text()"io,
+        subscriptionID: ~x"./c:subscriptionID/text()"io
+      ],
+      paySubscriptionDeleteReply: [
+        ~x".//c:paySubscriptionDeleteReply"o,
+        reasonCode: ~x"./c:reasonCode/text()"i,
+        subscriptionID: ~x"./c:subscriptionID/text()"io,
+        instrumentIdentifierID: ~x"./c:instrumentIdentifierID/text()"io
+      ],
+      paySubscriptionCreateReply: [
+        ~x".//c:paySubscriptionCreateReply"o,
+        reasonCode: ~x"./c:reasonCode/text()"i,
+        instrumentIdentifierID: ~x"./c:instrumentIdentifierID/text()"io,
+        instrumentIdentifierStatus: ~x"./c:instrumentIdentifierStatus/text()"so,
+        instrumentIdentifierNew: ~x"./c:instrumentIdentifierNew/text()"so,
+        subscriptionID: ~x"./c:subscriptionID/text()"io
+      ],
+      paySubscriptionUpdateReply: [
+        ~x".//c:paySubscriptionUpdateReply"o,
+        instrumentIdentifierStatus: ~x"./c:instrumentIdentifierStatus/text()"so,
+        instrumentIdentifierID: ~x"./c:instrumentIdentifierID/text()"io,
+        instrumentIdentifierNew: ~x"./c:instrumentIdentifierNew/text()"so,
+        cardAccountNumber: ~x"./c:cardAccountNumber/text()"so,
+        subscriptionID: ~x"./c:subscriptionID/text()"io
+      ],
       fault: [
         ~x"//soap:Envelope/soap:Body/soap:Fault"o,
         faultCode: ~x"./faultcode/text()"s,
-        faultString: ~x"./faultstring/text()"s,
+        faultString: ~x"./faultstring/text()"s
       ]
     )
   end
