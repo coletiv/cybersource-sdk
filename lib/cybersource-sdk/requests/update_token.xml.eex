@@ -12,19 +12,10 @@
 		<merchantID><%= @merchant_id %></merchantID>
 		<merchantReferenceCode><%= @reference_id %></merchantReferenceCode>
     <clientLibrary><%= @client_library %></clientLibrary>
-    <billTo>
-			<firstName><%= @first_name %></firstName>
-			<lastName><%= @last_name %></lastName>
-			<street1><%= @street1 %></street1>
-			<street2><%= @street2 %></street2>
-			<city><%= @city %></city>
-			<country><%= @country %></country>
-			<email><%= @email %></email>
-		</billTo>
     <card>
       <expirationMonth><%= @expiration_month %></expirationMonth>
       <expirationYear><%= @expiration_year %></expirationYear>
-      <cardType><%= @card_type %></cardType>
+      <!--cardType><%= @card_type %></cardType-->
     </card>
     <recurringSubscriptionInfo>
       <subscriptionID><%= @subscription_id %></subscriptionID>

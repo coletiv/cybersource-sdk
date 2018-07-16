@@ -15,6 +15,9 @@ defmodule CyberSourceSDK.Client do
   More information:
   - Token Management System: http://apps.cybersource.com/library/documentation/dev_guides/Token_Management/SO_API/TMS_SO_API.pdf
   - Payment Tokenization: https://www.cybersource.com/content/dam/cybersource/Payment_Tokenization_SO_API.pdf
+  - Reccuring Bill: http://apps.cybersource.com/library/documentation/dev_guides/Recurring_Billing/UBC/Recurring_Billing_UBC.pdf
+
+  - https://docs.oracle.com/cd/E68434_01/oroms/pdf/5/cws_help/SO04_16CYB.htm
   """
 
   import SweetXml
@@ -329,10 +332,51 @@ defmodule CyberSourceSDK.Client do
   # you store on your server.
   #
 
-  def create_token(reference_id, worker \\ :merchant) do
-    replace_params = get_configuration_params(worker) ++ [reference_id: reference_id]
+  def create_token(
+        pan,
+        expiration_year,
+        expiration_month,
+        reference_id,
+        worker \\ :merchant
+      ) do
+    {first_4digits_pan, ""} =
+      pan
+      |> String.slice(0..3)
+      |> String.to_integer(pan)
+
+    card_type = get_card_type_by_number(first_4digits_pan)
+
+    replace_params =
+      get_configuration_params(worker) ++
+        [
+          reference_id: reference_id,
+          pan: pan,
+          expiration_month: expiration_month,
+          expiration_year: expiration_year,
+          card_type: card_type
+        ]
 
     EEx.eval_file(get_template("create_token.xml"), assigns: replace_params)
+    |> call
+  end
+
+  def update_token(
+        subscription_id,
+        expiration_year,
+        expiration_month,
+        reference_id,
+        worker \\ :merchant
+      ) do
+    replace_params =
+      get_configuration_params(worker) ++
+        [
+          reference_id: reference_id,
+          subscription_id: subscription_id,
+          expiration_year: expiration_year,
+          expiration_month: expiration_month
+        ]
+
+    EEx.eval_file(get_template("update_token.xml"), assigns: replace_params)
     |> call
   end
 
@@ -389,6 +433,40 @@ defmodule CyberSourceSDK.Client do
       "ORICO" -> "053"
       "ELO" -> "054"
       _ -> nil
+    end
+  end
+
+  defp get_card_type_by_number(card_number)
+       when is_number(card_number) and card_number >= 0 and card_number <= 9999 do
+    first_digit = Kernel.trunc(Float.floor(card_number / 1000))
+    two_first_digit = Kernel.trunc(Float.floor(card_number / 100))
+
+    cond do
+      first_digit == 4 ->
+        "001"
+
+      (two_first_digit >= 51 && two_first_digit <= 55) ||
+          (two_first_digit >= 22 && two_first_digit <= 27) ->
+        "002"
+
+      first_digit == 6 ->
+        "004"
+
+      two_first_digit == 34 || two_first_digit == 37 ->
+        "003"
+
+      # OR 006
+      two_first_digit == 38 ->
+        "005"
+
+      card_number >= 3528 && card_number <= 3589 ->
+        "007"
+
+      card_number == 2014 || card_number == 2149 ->
+        "014"
+
+      true ->
+        nil
     end
   end
 

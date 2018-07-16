@@ -13,6 +13,12 @@
       <merchantID><%= @merchant_id %></merchantID>
       <merchantReferenceCode><%= @reference_id %></merchantReferenceCode>
       <clientLibrary><%= @client_library %></clientLibrary>
+      <card>
+  			<accountNumber><%= @pan %></accountNumber>
+  			<expirationMonth><%= @expire_month %></expirationMonth>
+  			<expirationYear><%= @expire_year %></expirationYear>
+  			<cardType><%= @card_type %></cardType>
+		  </card>
       <recurringSubscriptionInfo>
         <frequency>on-demand</frequency>
       </recurringSubscriptionInfo>
