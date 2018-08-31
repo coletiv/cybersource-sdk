@@ -197,8 +197,7 @@ defmodule CyberSourceSDK.Client do
 
         if length(merchant_configuration) > 0 do
           replace_params =
-            get_configuration_params(worker) ++
-              [request_id: request_id, reference_id: order_id]
+            get_configuration_params(worker) ++ [request_id: request_id, reference_id: order_id]
 
           EEx.eval_file(get_template("void_request.xml"), assigns: replace_params)
           |> call
@@ -323,6 +322,7 @@ defmodule CyberSourceSDK.Client do
   end
 
   # Get Payment parameters
+  @spec get_payment_params(String.t(), float(), String.t(), String.t()) :: list()
   def get_payment_params(order_id, price, encrypted_token, card_type) do
     [
       reference_id: order_id,
@@ -332,6 +332,7 @@ defmodule CyberSourceSDK.Client do
     ]
   end
 
+  @spec get_card_type(String.t()) :: String.t() | nil
   defp get_card_type(card_type) do
     case card_type do
       "VISA" -> "001"
@@ -343,6 +344,7 @@ defmodule CyberSourceSDK.Client do
     end
   end
 
+  @spec get_configuration_params(atom()) :: list()
   def get_configuration_params(worker) do
     merchant_configuration = Application.get_env(:cybersource_sdk, worker)
 
@@ -359,6 +361,7 @@ defmodule CyberSourceSDK.Client do
   end
 
   # Make HTTPS request
+  @spec call(String.t()) :: {:ok, map()} | {:error, String.t()} | {:error, :unknown_response}
   defp call(xml_body) do
     endpoint = Application.get_env(:cybersource_sdk, :endpoint)
 
@@ -386,6 +389,7 @@ defmodule CyberSourceSDK.Client do
   end
 
   # Parse response from CyberSource
+  @spec parse_response(String.t()) :: map()
   def parse_response(xml) do
     xml
     |> xmap(
@@ -439,11 +443,13 @@ defmodule CyberSourceSDK.Client do
       fault: [
         ~x"//soap:Envelope/soap:Body/soap:Fault"o,
         faultCode: ~x"./faultcode/text()"s,
-        faultString: ~x"./faultstring/text()"s,
+        faultString: ~x"./faultstring/text()"s
       ]
     )
   end
 
+  @spec handle_response(map()) ::
+          {:ok, map()} | {:error, String.t()} | {:error, :unknown_response}
   defp handle_response(response) do
     cond do
       response.decision != "" ->

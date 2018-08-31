@@ -10,8 +10,9 @@ defmodule CyberSourceSDK do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(CyberSourceSDK.Client, []),
+      worker(CyberSourceSDK.Client, [])
     ]
+
     opts = [strategy: :one_for_one, name: CyberSourceSDK.Supervisor]
 
     Supervisor.start_link(children, opts)
@@ -31,13 +32,31 @@ defmodule CyberSourceSDK do
   - worker: Atom with name of the structure in configurations to be used. (Optional)
 
   """
-  def authorize(price, merchant_reference_code, card_type, encrypted_payment, bill_to \\ [], worker \\ :merchant) do
-    CyberSourceSDK.Client.authorize(price, merchant_reference_code, card_type, encrypted_payment, bill_to, worker)
+  @spec authorize(float(), String.t(), String.t(), String.t(), list(String.t()), atom()) ::
+          {:ok} | {:error, atom()} | {:error, String.t()}
+  def authorize(
+        price,
+        merchant_reference_code,
+        card_type,
+        encrypted_payment,
+        bill_to \\ [],
+        worker \\ :merchant
+      ) do
+    CyberSourceSDK.Client.authorize(
+      price,
+      merchant_reference_code,
+      card_type,
+      encrypted_payment,
+      bill_to,
+      worker
+    )
   end
 
   @doc """
   Send a capture request to charge the user account.
   """
+  @spec capture(String.t(), String.t(), list(), atom()) ::
+          {:ok} | {:error, atom()} | {:error, String.t()}
   def capture(order_id, request_id, items \\ [], worker \\ :merchant) do
     CyberSourceSDK.Client.capture(order_id, request_id, items, worker)
   end
@@ -45,6 +64,8 @@ defmodule CyberSourceSDK do
   @doc """
   Send a refund request o remove the hold on user money.
   """
+  @spec refund(String.t(), String.t(), list(), atom()) ::
+          {:ok} | {:error, atom()} | {:error, String.t()}
   def refund(order_id, request_id, items \\ [], worker \\ :merchant) do
     CyberSourceSDK.Client.refund(order_id, request_id, items, worker)
   end
@@ -52,15 +73,53 @@ defmodule CyberSourceSDK do
   @doc """
   Pay with Android Pay request
   """
-  def pay_with_android_pay(price, merchant_reference_code, card_type, encrypted_payment, bill_to \\ [], worker \\ :merchant) do
-    CyberSourceSDK.Client.pay_with_android_pay(price, merchant_reference_code, card_type, encrypted_payment, bill_to, worker)
+  @spec pay_with_android_pay(
+          float(),
+          String.t(),
+          String.t(),
+          String.t(),
+          list(String.t()),
+          atom()
+        ) :: {:ok} | {:error, atom()} | {:error, String.t()}
+  def pay_with_android_pay(
+        price,
+        merchant_reference_code,
+        card_type,
+        encrypted_payment,
+        bill_to \\ [],
+        worker \\ :merchant
+      ) do
+    CyberSourceSDK.Client.pay_with_android_pay(
+      price,
+      merchant_reference_code,
+      card_type,
+      encrypted_payment,
+      bill_to,
+      worker
+    )
   end
 
   @doc """
   Pay with Apple Pay request
   """
-  def pay_with_apple_pay(price, merchant_reference_code, card_type, encrypted_payment, bill_to \\ [], worker \\ :merchant) do
-    CyberSourceSDK.Client.pay_with_apple_pay(price, merchant_reference_code, card_type, encrypted_payment, bill_to, worker)
+  @spec pay_with_apple_pay(float(), String.t(), String.t(), String.t(), list(String.t()), atom()) ::
+          {:ok} | {:error, atom()} | {:error, String.t()}
+  def pay_with_apple_pay(
+        price,
+        merchant_reference_code,
+        card_type,
+        encrypted_payment,
+        bill_to \\ [],
+        worker \\ :merchant
+      ) do
+    CyberSourceSDK.Client.pay_with_apple_pay(
+      price,
+      merchant_reference_code,
+      card_type,
+      encrypted_payment,
+      bill_to,
+      worker
+    )
   end
 
   @doc """
@@ -71,6 +130,15 @@ defmodule CyberSourceSDK do
       iex> CyberSourceSDK.bill_to("John", "Doe", "Main Street", "2 Left", "New York", "USA", "john@example.com")
       [first_name: "John", last_name: "Doe", street1: "Main Street", street2: "2 Left", city: "New York", country: "USA", email: "john@example.com"]
   """
+  @spec bill_to(
+          String.t(),
+          String.t(),
+          String.t(),
+          String.t(),
+          String.t(),
+          String.t(),
+          String.t()
+        ) :: list(String.t())
   def bill_to(first_name, last_name, street1, street2, city, country, email) do
     [
       first_name: first_name,
