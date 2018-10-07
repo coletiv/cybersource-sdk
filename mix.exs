@@ -41,7 +41,7 @@ defmodule CyberSourceSDK.Mixfile do
   defp deps do
     [
       {:sweet_xml, "~> 0.6"},
-      {:httpoison, "~> 1.0"},
+      {:httpoison, "~> 0.13"},
       {:poison, ">= 2.0.0"},
       {:ex_doc, "~> 0.18", only: :dev},
       {:bypass, "~> 0.6", only: :test}
