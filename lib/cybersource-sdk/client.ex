@@ -364,8 +364,14 @@ defmodule CyberSourceSDK.Client do
   @spec call(String.t()) :: {:ok, map()} | {:error, String.t()} | {:error, :unknown_response}
   defp call(xml_body) do
     endpoint = Application.get_env(:cybersource_sdk, :endpoint)
+    timeout = Application.get_env(:cybersource_sdk, :timeout, 8000)
 
-    case HTTPoison.post(endpoint, xml_body, [{"Content-Type", "application/xml"}]) do
+    case HTTPoison.post(
+           endpoint,
+           xml_body,
+           [{"Content-Type", "application/xml"}],
+           timeout: timeout
+         ) do
       {:ok, %HTTPoison.Response{body: response_body}} ->
         parse_response(response_body)
         |> handle_response
