@@ -20,7 +20,10 @@ defmodule CyberSourceSDK.Mixfile do
 
       # Docs
       name: "CyberSource SDK",
-      source_url: "https://github.com/coletiv/cybersource-sdk"
+      source_url: "https://github.com/coletiv/cybersource-sdk",
+      docs: [
+        extras: ["README.md"]
+      ]
     ]
   end
 
@@ -43,7 +46,7 @@ defmodule CyberSourceSDK.Mixfile do
       {:sweet_xml, "~> 0.6"},
       {:httpoison, "~> 0.13"},
       {:poison, ">= 2.0.0"},
-      {:ex_doc, "~> 0.18", only: :dev},
+      {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:bypass, "~> 0.6", only: :test}
     ]
   end
