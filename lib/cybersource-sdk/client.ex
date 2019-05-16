@@ -431,7 +431,7 @@ defmodule CyberSourceSDK.Client do
         reasonCode: ~x"./c:reasonCode/text()"i,
         amount: ~x"./c:amount/text()"of,
         requestDateTime: ~x"./c:requestDateTime/text()"so,
-        currency: ~x"./c:currency/text()"io
+        currency: ~x"./c:currency/text()"so
       ],
       ccCreditReply: [
         ~x".//c:ccCreditReply"o,
