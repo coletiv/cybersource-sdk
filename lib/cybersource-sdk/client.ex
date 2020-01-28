@@ -106,6 +106,40 @@ defmodule CyberSourceSDK.Client do
   end
 
   @doc """
+  Create a credit card token
+
+  ## Example
+
+  ```
+  bill_to = CyberSourceSDK.bill_to("John", "Doe", "Marylane Street", "34", "New York", "12345", "NY" "USA", "john@example.com")
+  credit_card = CyberSourceSDK.credit_card("4111111111111111", "12", "2020", "001")
+  create_credit_card_token("1234", credit_card, bill_to)
+  ```
+  """
+  def create_credit_card_token(
+        merchant_reference_code,
+        credit_card,
+        bill_to,
+        worker \\ :merchant
+      )
+  def create_credit_card_token(merchant_reference_code, credit_card, bill_to, worker \\ :merchant) do
+    case validate_merchant_reference_code(merchant_reference_code) do
+      {:error, reason} ->
+        {:error, reason}
+
+      merchant_reference_code_validated ->
+        merchant_configuration = get_configuration_params(worker)
+        if length(merchant_configuration) > 0 do
+          replace_params = CyberSourceSDK.Client.get_configuration_params(worker) ++ credit_card ++ bill_to ++ [reference_id: merchant_reference_code]
+
+          EEx.eval_file(get_template("credit_card_create.xml"), assigns: replace_params) |> call()
+        else
+          Helper.invalid_merchant_configuration()
+        end
+    end
+  end
+
+  @doc """
   Capture authorization on user credit card
 
   ## Parameters
@@ -333,13 +367,13 @@ defmodule CyberSourceSDK.Client do
   end
 
   @spec get_card_type(String.t()) :: String.t() | nil
-  defp get_card_type(card_type) do
+  def get_card_type(card_type) do
     case card_type do
       "VISA" -> "001"
       "MASTERCARD" -> "002"
       "AMEX" -> "003"
       "DISCOVER" -> "004"
-      "JCB" -> nil
+      "JCB" -> "007"
       _ -> nil
     end
   end

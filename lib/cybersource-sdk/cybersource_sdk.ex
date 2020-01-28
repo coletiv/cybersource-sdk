@@ -6,6 +6,9 @@ defmodule CyberSourceSDK do
 
   use Application
 
+  alias CyberSourceSDK.Client
+  alias CyberSourceSDK.Helper
+
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
@@ -123,12 +126,33 @@ defmodule CyberSourceSDK do
   end
 
   @doc """
+  Create a credit card token
+
+  ## Example
+
+  ```
+  bill_to = CyberSourceSDK.bill_to("John", "Doe", "Marylane Street", "34", "New York", "12345", "NY" "USA", "john@example.com")
+  credit_card = CyberSourceSDK.credit_card("4111111111111111", "12", "2020", "001")
+  create_credit_card_token("1234", credit_card, bill_to)
+  ```
+  """
+  def create_credit_card_token(
+        merchant_reference_code,
+        credit_card,
+        bill_to,
+        worker \\ :merchant
+      )
+  def create_credit_card_token(merchant_reference_code, credit_card, bill_to, worker \\ :merchant) do
+    Client.create_credit_card_token(merchant_reference_code, credit_card, bill_to, worker)
+  end
+
+  @doc """
   Generate BillTo object to replace parameters in request XML
 
   ## Examples
 
-      iex> CyberSourceSDK.bill_to("John", "Doe", "Main Street", "2 Left", "New York", "USA", "john@example.com")
-      [first_name: "John", last_name: "Doe", street1: "Main Street", street2: "2 Left", city: "New York", country: "USA", email: "john@example.com"]
+      iex> CyberSourceSDK.bill_to("John", "Doe", "Main Street", "2 Left", "New York", "12345", "NY", "USA", "john@example.com")
+      [first_name: "John", last_name: "Doe", street1: "Main Street", street2: "2 Left", city: "New York", post_code: "12345", state: "NY", country: "USA", email: "john@example.com"]
   """
   @spec bill_to(
           String.t(),
@@ -137,17 +161,44 @@ defmodule CyberSourceSDK do
           String.t(),
           String.t(),
           String.t(),
+          String.t(),
+          String.t(),
           String.t()
         ) :: list(String.t())
-  def bill_to(first_name, last_name, street1, street2, city, country, email) do
+  def bill_to(first_name, last_name, street1, street2, city, post_code, state, country, email) do
     [
       first_name: first_name,
       last_name: last_name,
       street1: street1,
       street2: street2,
       city: city,
+      post_code: post_code,
+      state: state,
       country: country,
       email: email
+    ]
+  end
+
+
+  @doc """
+  Generate creditCard object to replace parameters in request XML
+
+  ## Examples
+
+      iex> CyberSourceSDK.credit_card("4111111111111111", "12", "2020")
+      [card_number: "4111111111111111", expiration_month: "12", expiration_year: "2020", card_type: "001"]
+  """
+  @spec credit_card(
+          String.t(),
+          String.t(),
+          String.t()
+        ) :: list(String.t())
+  def credit_card(card_number, expiration_month, expiration_year) do
+    [
+      card_number: card_number,
+      expiration_month: expiration_month,
+      expiration_year: expiration_year,
+      card_type: Client.get_card_type(Helper.card_type_from_number(card_number))
     ]
   end
 end
