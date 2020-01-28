@@ -21,7 +21,7 @@ defmodule CyberSourceSDK.RequestTest do
     end)
 
     object = ~s({"header": "header", "signature": "signature"})
-		bill_to = CyberSourceSDK.bill_to("John", "Doe", "Maryland Street", "34", "New York", "USA", "john@example.com")
+		bill_to = CyberSourceSDK.bill_to("John", "Doe", "Maryland Street", "34", "New York", "12345", "NY", "USA", "john@example.com")
 
     request_params = Base.encode64(object)
 
