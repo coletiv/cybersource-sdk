@@ -84,4 +84,27 @@ defmodule CyberSourceSDK.Helper do
   def invalid_merchant_configuration() do
     {:error, "Invalid merchant configuration"}
   end
+
+  @doc """
+  Dedude card type from card number
+  """
+  @spec card_type_from_number(card_number :: String.t()) :: String.t()
+  def card_type_from_number(card_number) do
+    cond do
+      String.match?(card_number, ~r/^4[0-9]{6,}$/) ->
+        "VISA"
+      String.match?(card_number, ~r/^3[47][0-9]{5,}$/) ->
+        "AMEX"
+      String.match?(card_number, ~r/^6(?:011|5[0-9]{2})[0-9]{3,}$/) ->
+        "DISCOVER"
+      String.match?(card_number, ~r/^(?:2131|1800|35[0-9]{3})[0-9]{3,}$/) ->
+        "JCB"
+      String.match?(card_number, ~r/^5[1-5][0-9]{5,}|222[1-9][0-9]{3,}|22[3-9][0-9]{4,}|2[3-6][0-9]{5,}|27[01][0-9]{4,}|2720[0-9]{3,}$/) ->
+        "MASTERCARD"
+      true ->
+        # Unfortunately, there are a number of card types processed with the MasterCard system that do not live in MasterCard’s IIN range
+        # https://stackoverflow.com/questions/72768/how-do-you-detect-credit-card-type-based-on-number
+        "MASTERCARD"
+    end
+  end
 end
