@@ -140,6 +140,44 @@ defmodule CyberSourceSDK.Client do
   end
 
   @doc """
+  Update a credit card
+
+  ## Example
+
+  ```
+  bill_to = CyberSourceSDK.bill_to(nil, nil, nil, nil, nil, nil, nil, nil, "john@otherexample.com") # can also be nil
+  credit_card = CyberSourceSDK.credit_card(nil, "12", "2024", nil) # can also be nil
+  update_credit_card("1234", "XXXXXXXX", credit_card, bill_to)
+  ```
+  """
+  def update_credit_card(
+        merchant_reference_code,
+        token,
+        credit_card,
+        bill_to,
+        worker \\ :merchant
+      )
+  def update_credit_card(merchant_reference_code, token, credit_card, bill_to, worker) do
+    credit_card = if is_nil(credit_card), do: CyberSourceSDK.credit_card(nil, nil, nil), else: credit_card
+    bill_to = if is_nil(bill_to), do: CyberSourceSDK.bill_to(nil, nil, nil, nil, nil, nil, nil, nil, nil), else: bill_to
+
+    case validate_merchant_reference_code(merchant_reference_code) do
+      {:error, reason} ->
+        {:error, reason}
+
+      merchant_reference_code_validated ->
+        merchant_configuration = get_configuration_params(worker)
+        if length(merchant_configuration) > 0 do
+          replace_params = CyberSourceSDK.Client.get_configuration_params(worker) ++ credit_card ++ bill_to ++ [reference_id: merchant_reference_code_validated, token: token]
+
+          EEx.eval_file(get_template("credit_card_update.xml"), assigns: replace_params) |> call()
+        else
+          Helper.invalid_merchant_configuration()
+        end
+    end
+  end
+
+  @doc """
   Retrieve a credit card by reference code and token
 
   ## Example
@@ -576,6 +614,11 @@ defmodule CyberSourceSDK.Client do
       ],
       paySubscriptionCreateReply: [
         ~x".//c:paySubscriptionCreateReply"o,
+        reasonCode: ~x"./c:reasonCode/text()"i,
+        subscriptionID: ~x"./c:subscriptionID/text()"i,
+      ],
+      paySubscriptionUpdateReply: [
+        ~x".//c:paySubscriptionUpdateReply"o,
         reasonCode: ~x"./c:reasonCode/text()"i,
         subscriptionID: ~x"./c:subscriptionID/text()"i,
       ],
