@@ -202,6 +202,38 @@ defmodule CyberSourceSDK.Client do
   end
 
   @doc """
+  Charge a credit card by token
+
+  ## Example
+
+  ```
+  charge_credit_card(10.00, "1234", "XXXXXXXXXXXXX")
+  ```
+  """
+  def charge_credit_card(
+        price,
+        merchant_reference_code,
+        token,
+        worker \\ :merchant
+      )
+  def charge_credit_card(price, merchant_reference_code, token, worker) do
+    case validate_merchant_reference_code(merchant_reference_code) do
+      {:error, reason} ->
+        {:error, reason}
+
+      merchant_reference_code_validated ->
+        merchant_configuration = get_configuration_params(worker)
+        if length(merchant_configuration) > 0 do
+          replace_params = CyberSourceSDK.Client.get_configuration_params(worker) ++ [reference_id: merchant_reference_code_validated, token: token, price: price]
+
+          EEx.eval_file(get_template("credit_card_charge.xml"), assigns: replace_params) |> call()
+        else
+          Helper.invalid_merchant_configuration()
+        end
+    end
+  end
+
+  @doc """
   Capture authorization on user credit card
 
   ## Parameters
@@ -511,7 +543,7 @@ defmodule CyberSourceSDK.Client do
         reasonCode: ~x"./c:reasonCode/text()"i,
         amount: ~x"./c:amount/text()"of,
         requestDateTime: ~x"./c:requestDateTime/text()"so,
-        reconciliationID: ~x"./c:reconciliationID/text()"io
+        reconciliationID: ~x"./c:reconciliationID/text()"so
       ],
       ccAuthReversalReply: [
         ~x".//c:ccAuthReversalReply"o,

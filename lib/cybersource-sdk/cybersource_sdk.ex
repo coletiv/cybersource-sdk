@@ -183,6 +183,25 @@ defmodule CyberSourceSDK do
   end
 
   @doc """
+  Charge a credit card by token
+
+  ## Example
+
+  ```
+  charge_credit_card(10.00, "1234", "XXXXXXXXXXXXXXXX")
+  ```
+  """
+  @spec charge_credit_card(
+        float(),
+        String.t(),
+        String.t(),
+        atom()
+      ) :: {:ok, map()} | {:error, atom()} | {:error, String.t()}
+  def charge_credit_card(price, merchant_reference_code, token, worker \\ :merchant) do
+    Client.charge_credit_card(price, merchant_reference_code, token, worker)
+  end
+
+  @doc """
   Generate BillTo object to replace parameters in request XML
 
   ## Examples
