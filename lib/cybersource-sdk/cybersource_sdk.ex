@@ -165,6 +165,24 @@ defmodule CyberSourceSDK do
   end
 
   @doc """
+  Delete a credit card by token + reference
+
+  ## Example
+
+  ```
+  delete_credit_card("1234", "XXXXXXXXXXXXXXXX")
+  ```
+  """
+  @spec delete_credit_card(
+        String.t(),
+        String.t(),
+        atom()
+      ) :: {:ok, map()} | {:error, atom()} | {:error, String.t()}
+  def delete_credit_card(merchant_reference_code, token, worker \\ :merchant) do
+    Client.delete_credit_card(merchant_reference_code, token, worker)
+  end
+
+  @doc """
   Generate BillTo object to replace parameters in request XML
 
   ## Examples

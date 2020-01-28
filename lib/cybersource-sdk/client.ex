@@ -171,6 +171,37 @@ defmodule CyberSourceSDK.Client do
   end
 
   @doc """
+  Delete a credit card by reference code and token
+
+  ## Example
+
+  ```
+  delete_credit_card("1234", "XXXXXXXXXXXXX")
+  ```
+  """
+  def delete_credit_card(
+        merchant_reference_code,
+        token,
+        worker \\ :merchant
+      )
+  def delete_credit_card(merchant_reference_code, token, worker) do
+    case validate_merchant_reference_code(merchant_reference_code) do
+      {:error, reason} ->
+        {:error, reason}
+
+      merchant_reference_code_validated ->
+        merchant_configuration = get_configuration_params(worker)
+        if length(merchant_configuration) > 0 do
+          replace_params = CyberSourceSDK.Client.get_configuration_params(worker) ++ [reference_id: merchant_reference_code_validated, token: token]
+
+          EEx.eval_file(get_template("credit_card_delete.xml"), assigns: replace_params) |> call()
+        else
+          Helper.invalid_merchant_configuration()
+        end
+    end
+  end
+
+  @doc """
   Capture authorization on user credit card
 
   ## Parameters
@@ -513,6 +544,11 @@ defmodule CyberSourceSDK.Client do
       ],
       paySubscriptionCreateReply: [
         ~x".//c:paySubscriptionCreateReply"o,
+        reasonCode: ~x"./c:reasonCode/text()"i,
+        subscriptionID: ~x"./c:subscriptionID/text()"i,
+      ],
+      paySubscriptionDeleteReply: [
+        ~x".//c:paySubscriptionDeleteReply"o,
         reasonCode: ~x"./c:reasonCode/text()"i,
         subscriptionID: ~x"./c:subscriptionID/text()"i,
       ],
