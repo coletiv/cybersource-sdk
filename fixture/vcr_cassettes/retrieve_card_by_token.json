@@ -1,0 +1,34 @@
+[
+  {
+    "request": {
+      "body": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<SOAP-ENV:Envelope xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:ns1=\"urn:schemas-cybersource-com:transaction-data-1.120\" xmlns:ns2=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\">\n  <SOAP-ENV:Header>\n    <ns2:Security SOAP-ENV:mustUnderstand=\"1\">\n      <ns2:UsernameToken>\n        <ns2:Username>MERCHANT_ID</ns2:Username>\n        <ns2:Password>MERCHANT_TRANSACTION_KEY</ns2:Password>\n      </ns2:UsernameToken>\n    </ns2:Security>\n  </SOAP-ENV:Header>\n  <SOAP-ENV:Body>\n    <ns1:requestMessage>\n      <ns1:merchantID>MERCHANT_ID</ns1:merchantID>\n      <ns1:merchantReferenceCode>123</ns1:merchantReferenceCode>\n      <ns1:recurringSubscriptionInfo>\n        <ns1:subscriptionID>234567891</ns1:subscriptionID>\n        <ns1:approvalRequired>false</ns1:approvalRequired>\n      </ns1:recurringSubscriptionInfo>\n      <ns1:paySubscriptionRetrieveService run=\"true\"/>\n    </ns1:requestMessage>\n  </SOAP-ENV:Body>\n</SOAP-ENV:Envelope>",
+      "headers": {
+        "Content-Type": "application/xml"
+      },
+      "method": "post",
+      "options": {
+        "connect_timeout": 8000
+      },
+      "request_body": "",
+      "url": "https://ics2wstest.ic3.com/commerce/1.x/transactionProcessor/CyberSourceTransaction_1.142.wsdl"
+    },
+    "response": {
+      "binary": false,
+      "body": "<?xml version=\"1.0\" encoding=\"utf-8\"?><soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">\n<soap:Header>\n<wsse:Security xmlns:wsse=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd\"><wsu:Timestamp xmlns:wsu=\"http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd\" wsu:Id=\"Timestamp-292959109\"><wsu:Created>2020-01-28T11:00:25.397Z</wsu:Created></wsu:Timestamp></wsse:Security></soap:Header><soap:Body><c:replyMessage xmlns:c=\"urn:schemas-cybersource-com:transaction-data-1.120\"><c:merchantReferenceCode>123</c:merchantReferenceCode><c:requestID>1234592252656050004012</c:requestID><c:decision>ACCEPT</c:decision><c:reasonCode>100</c:reasonCode><c:requestToken>ABCDEFGTOog0gv0J2mAsABQBUagD3lSppAAAchk0kyxdfAwcQA0A6EJa</c:requestToken><c:paySubscriptionRetrieveReply><c:reasonCode>100</c:reasonCode><c:approvalRequired>false</c:approvalRequired><c:automaticRenew>false</c:automaticRenew><c:cardAccountNumber>411111XXXXXX1111</c:cardAccountNumber><c:cardExpirationMonth>12</c:cardExpirationMonth><c:cardExpirationYear>2020</c:cardExpirationYear><c:cardType>001</c:cardType><c:city>New York</c:city><c:country>US</c:country><c:currency>USD</c:currency><c:email>john@example.com</c:email><c:endDate>99991231</c:endDate><c:firstName>JOHN</c:firstName><c:frequency>on-demand</c:frequency><c:lastName>DOE</c:lastName><c:paymentMethod>credit card</c:paymentMethod><c:paymentsRemaining>0</c:paymentsRemaining><c:postalCode>12345</c:postalCode><c:startDate>20200129</c:startDate><c:state>NY</c:state><c:status>CURRENT</c:status><c:street1>Marylane Street</c:street1><c:subscriptionID>234567891</c:subscriptionID><c:totalPayments>0</c:totalPayments><c:ownerMerchantID>MERCHANT_ID</c:ownerMerchantID></c:paySubscriptionRetrieveReply></c:replyMessage></soap:Body></soap:Envelope>",
+      "headers": {
+        "Server": "Apache-Coyote/1.1",
+        "X-OPNET-Transaction-Trace": "a2_43c578b0-f8df-40e8-b597-cac49ed41097",
+        "Strict-Transport-Security": "max-age=31536000",
+        "X-Frame-Options": "DENY",
+        "X-Content-Type-Options": "nosniff",
+        "X-XSS-Protection": "1; mode=block",
+        "v-c-response-time": "1580209225",
+        "Content-Type": "text/xml",
+        "Content-Length": "1848",
+        "Date": "Tue, 28 Jan 2020 11:00:24 GMT"
+      },
+      "status_code": 200,
+      "type": "ok"
+    }
+  }
+]

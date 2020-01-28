@@ -7,6 +7,7 @@ defmodule CyberSourceSDK.Mixfile do
       version: "1.0.4",
       elixir: "~> 1.2",
       deps: deps(),
+      test_coverage: [tool: ExCoveralls],
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       package: [
@@ -48,6 +49,8 @@ defmodule CyberSourceSDK.Mixfile do
       {:poison, ">= 2.0.0"},
       {:cowboy, "~> 1.1.2"},
       {:plug_cowboy, "~> 1.0"},
+      {:exvcr, "~> 0.10.3", only: [:dev, :test]},
+      {:excoveralls, "~> 0.11.1", only: [:dev, :test]},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:bypass, "~> 0.6", only: :test}
     ]

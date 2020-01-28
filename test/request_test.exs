@@ -1,7 +1,8 @@
 defmodule CyberSourceSDK.RequestTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
 
   setup do
+    Application.ensure_all_started(:bypass)
     bypass = Bypass.open()
 
     :ok = Application.put_env(:cybersource_sdk, :endpoint, endpoint_url(bypass.port))

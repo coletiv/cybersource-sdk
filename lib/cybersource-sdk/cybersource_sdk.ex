@@ -132,7 +132,7 @@ defmodule CyberSourceSDK do
 
   ```
   bill_to = CyberSourceSDK.bill_to("John", "Doe", "Marylane Street", "34", "New York", "12345", "NY", "USA", "john@example.com")
-  credit_card = CyberSourceSDK.credit_card("4111111111111111", "12", "2020", "001")
+  credit_card = CyberSourceSDK.credit_card("4111111111111111", "12", "2020")
   create_credit_card_token("1234", credit_card, bill_to)
   ```
   """
