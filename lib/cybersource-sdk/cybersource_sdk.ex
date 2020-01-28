@@ -136,12 +136,12 @@ defmodule CyberSourceSDK do
   create_credit_card_token("1234", credit_card, bill_to)
   ```
   """
-  def create_credit_card_token(
-        merchant_reference_code,
-        credit_card,
-        bill_to,
-        worker \\ :merchant
-      )
+  @spec create_credit_card_token(
+        String.t(),
+        keyword(),
+        keyword(),
+        atom()
+      ) :: {:ok, map()} | {:error, atom()} | {:error, String.t()}
   def create_credit_card_token(merchant_reference_code, credit_card, bill_to, worker \\ :merchant) do
     Client.create_credit_card_token(merchant_reference_code, credit_card, bill_to, worker)
   end

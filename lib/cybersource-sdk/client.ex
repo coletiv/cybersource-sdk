@@ -122,7 +122,7 @@ defmodule CyberSourceSDK.Client do
         bill_to,
         worker \\ :merchant
       )
-  def create_credit_card_token(merchant_reference_code, credit_card, bill_to, worker \\ :merchant) do
+  def create_credit_card_token(merchant_reference_code, credit_card, bill_to, worker) do
     case validate_merchant_reference_code(merchant_reference_code) do
       {:error, reason} ->
         {:error, reason}
@@ -130,7 +130,7 @@ defmodule CyberSourceSDK.Client do
       merchant_reference_code_validated ->
         merchant_configuration = get_configuration_params(worker)
         if length(merchant_configuration) > 0 do
-          replace_params = CyberSourceSDK.Client.get_configuration_params(worker) ++ credit_card ++ bill_to ++ [reference_id: merchant_reference_code]
+          replace_params = CyberSourceSDK.Client.get_configuration_params(worker) ++ credit_card ++ bill_to ++ [reference_id: merchant_reference_code_validated]
 
           EEx.eval_file(get_template("credit_card_create.xml"), assigns: replace_params) |> call()
         else

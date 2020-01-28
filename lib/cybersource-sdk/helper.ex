@@ -44,7 +44,7 @@ defmodule CyberSourceSDK.Helper do
   def json_from_base64(base64_string) do
     case Base.decode64(base64_string) do
       {:ok, json} ->
-        case Poison.Parser.parse(json) do
+        case Poison.decode(json) do
           {:ok, json} -> {:ok, convert_map_to_key_atom(json)}
           {:error, reason} -> {:error, reason}
         end

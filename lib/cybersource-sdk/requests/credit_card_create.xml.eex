@@ -19,7 +19,7 @@
         <ns1:street1><%= @street1 %></ns1:street1>
         <ns1:city><%= @city %></ns1:city>
         <ns1:state><%= @state %></ns1:state>
-        <ns1:postalCode><%= @postal_code %></ns1:postalCode>
+        <ns1:postalCode><%= @post_code %></ns1:postalCode>
         <ns1:country><%= @country %></ns1:country>
         <ns1:email><%= @email %></ns1:email>
       </ns1:billTo>
