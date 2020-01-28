@@ -140,6 +140,37 @@ defmodule CyberSourceSDK.Client do
   end
 
   @doc """
+  Retrieve a credit card by reference code and token
+
+  ## Example
+
+  ```
+  retrieve_credit_card("1234", "XXXXXXXXXXXXX")
+  ```
+  """
+  def retrieve_credit_card(
+        merchant_reference_code,
+        token,
+        worker \\ :merchant
+      )
+  def retrieve_credit_card(merchant_reference_code, token, worker) do
+    case validate_merchant_reference_code(merchant_reference_code) do
+      {:error, reason} ->
+        {:error, reason}
+
+      merchant_reference_code_validated ->
+        merchant_configuration = get_configuration_params(worker)
+        if length(merchant_configuration) > 0 do
+          replace_params = CyberSourceSDK.Client.get_configuration_params(worker) ++ [reference_id: merchant_reference_code_validated, token: token]
+
+          EEx.eval_file(get_template("credit_card_retrieve.xml"), assigns: replace_params) |> call()
+        else
+          Helper.invalid_merchant_configuration()
+        end
+    end
+  end
+
+  @doc """
   Capture authorization on user credit card
 
   ## Parameters
@@ -479,6 +510,39 @@ defmodule CyberSourceSDK.Client do
         forwardCode: ~x"./c:forwardCode/text()"so,
         ownerMerchantID: ~x"./c:ownerMerchantID/text()"so,
         reconciliationReferenceNumber: ~x"./c:reconciliationReferenceNumber/text()"so
+      ],
+      paySubscriptionCreateReply: [
+        ~x".//c:paySubscriptionCreateReply"o,
+        reasonCode: ~x"./c:reasonCode/text()"i,
+        subscriptionID: ~x"./c:subscriptionID/text()"i,
+      ],
+      paySubscriptionRetrieveReply: [
+        ~x".//c:paySubscriptionRetrieveReply"o,
+        reasonCode: ~x"./c:reasonCode/text()"i,
+        approvalRequired: ~x"./c:approvalRequired/text()"s,
+        automaticRenew: ~x"./c:automaticRenew/text()"s,
+        cardAccountNumber: ~x"./c:cardAccountNumber/text()"s,
+        cardExpirationMonth: ~x"./c:cardExpirationMonth/text()"i,
+        cardExpirationYear: ~x"./c:cardExpirationYear/text()"i,
+        cardType: ~x"./c:cardType/text()"s,
+        city: ~x"./c:city/text()"s,
+        country: ~x"./c:country/text()"s,
+        currency: ~x"./c:currency/text()"s,
+        email: ~x"./c:email/text()"s,
+        endDate: ~x"./c:endDate/text()"i,
+        firstName: ~x"./c:firstName/text()"s,
+        frequency: ~x"./c:frequency/text()"s,
+        lastName: ~x"./c:lastName/text()"s,
+        paymentMethod: ~x"./c:paymentMethod/text()"s,
+        paymentsRemaining: ~x"./c:paymentsRemaining/text()"i,
+        postalCode: ~x"./c:postalCode/text()"s,
+        startDate: ~x"./c:startDate/text()"i,
+        state: ~x"./c:state/text()"s,
+        status: ~x"./c:status/text()"s,
+        street1: ~x"./c:street1/text()"s,
+        subscriptionID: ~x"./c:subscriptionID/text()"s,
+        totalPayments: ~x"./c:totalPayments/text()"i,
+        ownerMerchantID: ~x"./c:ownerMerchantID/text()"s
       ],
       fault: [
         ~x"//soap:Envelope/soap:Body/soap:Fault"o,

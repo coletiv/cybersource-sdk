@@ -147,6 +147,24 @@ defmodule CyberSourceSDK do
   end
 
   @doc """
+  Retrieve a credit card by token + reference
+
+  ## Example
+
+  ```
+  retrieve_credit_card("1234", "XXXXXXXXXXXXXXXX")
+  ```
+  """
+  @spec retrieve_credit_card(
+        String.t(),
+        String.t(),
+        atom()
+      ) :: {:ok, map()} | {:error, atom()} | {:error, String.t()}
+  def retrieve_credit_card(merchant_reference_code, token, worker \\ :merchant) do
+    Client.retrieve_credit_card(merchant_reference_code, token, worker)
+  end
+
+  @doc """
   Generate BillTo object to replace parameters in request XML
 
   ## Examples
