@@ -4,7 +4,7 @@ defmodule CyberSourceSDK.Mixfile do
   def project do
     [
       app: :cybersource_sdk,
-      version: "1.0.4",
+      version: "1.0.5",
       elixir: "~> 1.2",
       deps: deps(),
       test_coverage: [tool: ExCoveralls],
