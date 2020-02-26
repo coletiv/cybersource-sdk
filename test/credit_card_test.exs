@@ -30,7 +30,9 @@ defmodule CyberSourceSDK.CreditCardTest do
           reasonCode: 100,
           requestID: 1234592242856049004012,
           requestToken: "ABCDEFGSTOog0ehNMRk3sABRRqAPeVGYCo1AHvHjPSAAA5DJpJli6+Bg4kCcmdRBo9CaYjJvYAAAAqgih",
-          voidReply: nil
+          voidReply: nil,
+          invalidField: "",
+          missingField: ""
         }
       }
     end
@@ -83,7 +85,9 @@ defmodule CyberSourceSDK.CreditCardTest do
           reasonCode: 100,
           requestID: 1234592252656050004012,
           requestToken: "ABCDEFGTOog0gv0J2mAsABQBUagD3lSppAAAchk0kyxdfAwcQA0A6EJa",
-          voidReply: nil
+          voidReply: nil,
+          invalidField: "",
+          missingField: ""
         }
       }
     end
@@ -126,7 +130,9 @@ defmodule CyberSourceSDK.CreditCardTest do
         reasonCode: 100, 
         requestID: 1234500040956805804009, 
         requestToken: "ABCDEFGTOohQLmgdzm/pABQq3cuW7Bs1aspNKZTrNZUygxiQ1GoA98GZgKjUAe+DM9IFfkAOQyaSZYuvgYOIGBOTOohQLmgdzm/pAAAARhq0", 
-        voidReply: nil
+        voidReply: nil,
+        invalidField: "",
+        missingField: ""
       }
     end
   end
@@ -151,7 +157,9 @@ defmodule CyberSourceSDK.CreditCardTest do
         reasonCode: 100, 
         requestID: 1234501006036850704009, 
         requestToken: "ABCDEFGTOohTnCRTD/6JABRRqAPfG6wAAchk0kyxdfAwcQAA5yXM", 
-        voidReply: nil
+        voidReply: nil,
+        invalidField: "",
+        missingField: ""
       }
     end
   end
