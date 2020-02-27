@@ -608,6 +608,8 @@ defmodule CyberSourceSDK.Client do
 
     IO.inspect(xml_body)
     IO.inspect(endpoint)
+    IO.inspect(System.get_env("CYBERSOURCE_ENDPOINT"))
+    IO.inspect(Application.get_env(:cybersource_sdk, :endpoint))
 
     case HTTPoison.post(
            endpoint,
