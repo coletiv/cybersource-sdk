@@ -606,6 +606,9 @@ defmodule CyberSourceSDK.Client do
     endpoint = Application.get_env(:cybersource_sdk, :endpoint)
     timeout = Application.get_env(:cybersource_sdk, :timeout, 8000)
 
+    IO.inspect(xml_body)
+    IO.inspect(endpoint)
+
     case HTTPoison.post(
            endpoint,
            xml_body,
