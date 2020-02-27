@@ -590,9 +590,9 @@ defmodule CyberSourceSDK.Client do
 
     if !is_nil(merchant_configuration) do
       [
-        merchant_id: Map.get(merchant_configuration, :id),
-        transaction_key: Map.get(merchant_configuration, :transaction_key),
-        currency: Map.get(merchant_configuration, :currency),
+        merchant_id: Map.get(merchant_configuration, :id) || System.get_env("CYBERSOURCE_MERCHANT_ID"),
+        transaction_key: Map.get(merchant_configuration, :transaction_key) || System.get_env("CYBERSOURCE_TRANSACTION_KEY"),
+        currency: Map.get(merchant_configuration, :currency) || System.get_env("CYBERSOURCE_CURRENCY"),
         client_library: "CyberSourceSDK Elixir #{Application.spec(:cybersource_sdk, :vsn)}"
       ]
     else
@@ -603,13 +603,8 @@ defmodule CyberSourceSDK.Client do
   # Make HTTPS request
   @spec call(String.t()) :: {:ok, map()} | {:error, String.t()} | {:error, :unknown_response}
   defp call(xml_body) do
-    endpoint = Application.get_env(:cybersource_sdk, :endpoint)
+    endpoint = Application.get_env(:cybersource_sdk, :endpoint) || System.get_env("CYBERSOURCE_ENDPOINT")
     timeout = Application.get_env(:cybersource_sdk, :timeout, 8000)
-
-    IO.inspect(xml_body)
-    IO.inspect(endpoint)
-    IO.inspect(System.get_env("CYBERSOURCE_ENDPOINT"))
-    IO.inspect(Application.get_env(:cybersource_sdk, :endpoint))
 
     case HTTPoison.post(
            endpoint,
