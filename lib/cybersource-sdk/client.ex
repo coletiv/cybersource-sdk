@@ -558,6 +558,7 @@ defmodule CyberSourceSDK.Client do
   # Define path of request templates
   defp get_template(filename) do
     Path.join(__DIR__, "/requests/" <> filename <> ".eex")
+    Path.join(:code.priv_dir(:cybersource_sdk), "/requests/" <> filename <> ".eex")
   end
 
   # Get Payment parameters
@@ -611,7 +612,7 @@ defmodule CyberSourceSDK.Client do
            [{"Content-Type", "application/xml"}],
            timeout: timeout
          ) do
-      {:ok, response = %HTTPoison.Response{body: response_body}} ->
+      {:ok, %HTTPoison.Response{body: response_body}} ->
         parse_response(response_body)
         |> handle_response
 
