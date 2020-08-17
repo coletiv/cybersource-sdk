@@ -589,6 +589,7 @@ defmodule CyberSourceSDK.Client do
     merchant_configuration = Application.get_env(:cybersource_sdk, worker)
 
     if !is_nil(merchant_configuration) do
+      merchant_configuration = merchant_configuration |> Enum.into(%{})
       [
         merchant_id: Map.get(merchant_configuration, :id) || System.get_env("CYBERSOURCE_MERCHANT_ID"),
         transaction_key: Map.get(merchant_configuration, :transaction_key) || System.get_env("CYBERSOURCE_TRANSACTION_KEY"),
