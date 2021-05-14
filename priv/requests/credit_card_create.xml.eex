@@ -23,6 +23,9 @@
         <ns1:country><%= @country %></ns1:country>
         <ns1:email><%= @email %></ns1:email>
       </ns1:billTo>
+      <ns1:businessRules>
+        <ns1:ignoreAVSResult>true</ns1:ignoreAVSResult>
+      </ns1:businessRules>
       <ns1:purchaseTotals>
         <ns1:currency>USD</ns1:currency>
         <ns1:grandTotalAmount>0.00</ns1:grandTotalAmount>
