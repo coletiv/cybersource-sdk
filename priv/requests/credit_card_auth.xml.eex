@@ -16,14 +16,14 @@
         <ns1:currency>USD</ns1:currency>
         <ns1:grandTotalAmount><%= @price %></ns1:grandTotalAmount>
       </ns1:purchaseTotals>
-      <ns2:businessRules>
-        <ns2:ignoreAVSResult>true</ns2:ignoreAVSResult>
-      </ns2:businessRules>
       <ns1:recurringSubscriptionInfo>
         <ns1:subscriptionID><%= @token %></ns1:subscriptionID>
         <ns1:approvalRequired>false</ns1:approvalRequired>
       </ns1:recurringSubscriptionInfo>
       <ns1:ccAuthService run="true"/>
     </ns1:requestMessage>
+    <ns2:businessRules>
+      <ns2:ignoreAVSResult>true</ns2:ignoreAVSResult>
+    </ns2:businessRules>
   </SOAP-ENV:Body>
 </SOAP-ENV:Envelope>
