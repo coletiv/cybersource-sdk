@@ -6,4 +6,5 @@ config :cybersource_sdk,
     id: "xptoid123",
     transaction_key: "Base64EncodedKey==",
     currency: "USD"
-  }
+  },
+  debug: true

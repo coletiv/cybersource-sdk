@@ -13,6 +13,8 @@ defmodule CyberSourceSDK.Client do
   * Refund
   """
 
+  alias CyberSourceSDK.Logger
+
   @response_codes %{
     100 => "Successful transaction",
     101 => "Request is missing one or more required fields",
@@ -164,15 +166,19 @@ defmodule CyberSourceSDK.Client do
         worker \\ :merchant
       )
   def create_credit_card_token(merchant_reference_code, credit_card, bill_to, worker) do
+    Logger.info("Creating CC token")
     case validate_merchant_reference_code(merchant_reference_code) do
       {:error, reason} ->
+        Logger.error("Coundn't validate merchant reference code #{inspect(reason)}")
         {:error, reason}
 
       merchant_reference_code_validated ->
+        Logger.info("Merchant ref. code validated")
         merchant_configuration = get_configuration_params(worker)
         if length(merchant_configuration) > 0 do
           replace_params = CyberSourceSDK.Client.get_configuration_params(worker) ++ credit_card ++ bill_to ++ [reference_id: merchant_reference_code_validated]
 
+          Logger.info("running credit_card_create.xml")
           EEx.eval_file(get_template("credit_card_create.xml"), assigns: replace_params) |> call()
         else
           Helper.invalid_merchant_configuration()
@@ -604,6 +610,7 @@ defmodule CyberSourceSDK.Client do
   # Make HTTPS request
   @spec call(String.t()) :: {:ok, map()} | {:error, String.t()} | {:error, :unknown_response}
   defp call(xml_body) do
+    Logger.info("Running XML with body #{inspect(xml_body)}")
     endpoint = Application.get_env(:cybersource_sdk, :endpoint) || System.get_env("CYBERSOURCE_ENDPOINT")
     timeout = Application.get_env(:cybersource_sdk, :timeout, 8000)
 
@@ -617,7 +624,8 @@ defmodule CyberSourceSDK.Client do
         parse_response(response_body)
         |> handle_response
 
-      {:error, %HTTPoison.Error{id: _, reason: reason}} ->
+      {:error, %HTTPoison.Error{id: _, reason: reason}} = response ->
+        Logger.error("#{inspect(response)}")
         {:error, reason}
     end
   end
