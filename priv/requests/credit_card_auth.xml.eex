@@ -16,9 +16,9 @@
         <ns1:currency>USD</ns1:currency>
         <ns1:grandTotalAmount><%= @price %></ns1:grandTotalAmount>
       </ns1:purchaseTotals>
-      <ns1:businessRules>
-        <ns1:ignoreAVSResult>true</ns1:ignoreAVSResult>
-      </ns1:businessRules>
+      <ns2:businessRules>
+        <ns2:ignoreAVSResult>true</ns2:ignoreAVSResult>
+      </ns2:businessRules>
       <ns1:recurringSubscriptionInfo>
         <ns1:subscriptionID><%= @token %></ns1:subscriptionID>
         <ns1:approvalRequired>false</ns1:approvalRequired>
