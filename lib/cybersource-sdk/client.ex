@@ -625,6 +625,7 @@ defmodule CyberSourceSDK.Client do
         |> handle_response
 
       {:error, %HTTPoison.Error{id: _, reason: reason}} = response ->
+        Logger.info("Timeout: #{timeout}")
         Logger.error("#{inspect(response)}")
         {:error, reason}
     end
