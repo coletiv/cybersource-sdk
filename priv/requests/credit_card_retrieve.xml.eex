@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ns1="urn:schemas-cybersource-com:transaction-data-1.120" xmlns:ns2="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
+  <SOAP-ENV:Header>
+    <ns2:Security SOAP-ENV:mustUnderstand="1">
+      <ns2:UsernameToken>
+        <ns2:Username><%= @merchant_id %></ns2:Username>
+        <ns2:Password><%= @transaction_key %></ns2:Password>
+      </ns2:UsernameToken>
+    </ns2:Security>
+  </SOAP-ENV:Header>
+  <SOAP-ENV:Body>
+    <ns1:requestMessage>
+      <ns1:merchantID><%= @merchant_id %></ns1:merchantID>
+      <ns1:merchantReferenceCode><%= @reference_id %></ns1:merchantReferenceCode>
+      <ns1:recurringSubscriptionInfo>
+        <ns1:subscriptionID><%= @token %></ns1:subscriptionID>
+        <ns1:approvalRequired>false</ns1:approvalRequired>
+      </ns1:recurringSubscriptionInfo>
+      <ns1:paySubscriptionRetrieveService run="true"/>
+    </ns1:requestMessage>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
