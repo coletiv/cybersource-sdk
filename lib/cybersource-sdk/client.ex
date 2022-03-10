@@ -22,7 +22,8 @@ defmodule CyberSourceSDK.Client do
     150 => "General failure",
     151 => "The request was received but a server time-out occurred",
     152 => "The request was received, but a service timed out",
-    200 => "The authorization request was approved by the issuing bank but declined by CyberSource because it did not pass the AVS check",
+    200 =>
+      "The authorization request was approved by the issuing bank but declined by CyberSource because it did not pass the AVS check",
     201 => "The issuing bank has questions about the request",
     202 => "Expired card",
     203 => "General decline of the card",
@@ -34,7 +35,8 @@ defmodule CyberSourceSDK.Client do
     210 => "The card has reached the credit limit",
     211 => "Invalid card verification number",
     221 => "The customer matched an entry on the processor's negative file",
-    230 => "The authorization request was approved by the issuing bank but declined by CyberSource because it did not pass the card verification check",
+    230 =>
+      "The authorization request was approved by the issuing bank but declined by CyberSource because it did not pass the card verification check",
     231 => "Invalid account number",
     232 => "The card type is not accepted by the payment processor",
     233 => "General decline by the processor",
@@ -49,11 +51,13 @@ defmodule CyberSourceSDK.Client do
     242 => "You requested a capture, but there is no corresponding, unused authorization record.",
     243 => "The transaction has already been settled or reversed",
     244 => "The bank account number failed the validation check",
-    246 => "The capture or credit is not voidable because the capture or credit information has already been submitted to your processor",
+    246 =>
+      "The capture or credit is not voidable because the capture or credit information has already been submitted to your processor",
     247 => "You requested a credit for a capture that was previously voided",
     250 => "The request was received, but a time-out occurred with the payment processor",
     254 => "Your CyberSource account is prohibited from processing stand-alone refunds",
-    255 => "Your CyberSource account is not configured to process the service in the country you specified"
+    255 =>
+      "Your CyberSource account is not configured to process the service in the country you specified"
   }
 
   import SweetXml
@@ -165,8 +169,10 @@ defmodule CyberSourceSDK.Client do
         bill_to,
         worker \\ :merchant
       )
+
   def create_credit_card_token(merchant_reference_code, credit_card, bill_to, worker) do
     Logger.info("Creating CC token")
+
     case validate_merchant_reference_code(merchant_reference_code) do
       {:error, reason} ->
         Logger.error("Coundn't validate merchant reference code #{inspect(reason)}")
@@ -174,8 +180,11 @@ defmodule CyberSourceSDK.Client do
 
       merchant_reference_code_validated ->
         merchant_configuration = get_configuration_params(worker)
+
         if length(merchant_configuration) > 0 do
-          replace_params = CyberSourceSDK.Client.get_configuration_params(worker) ++ credit_card ++ bill_to ++ [reference_id: merchant_reference_code_validated]
+          replace_params =
+            CyberSourceSDK.Client.get_configuration_params(worker) ++
+              credit_card ++ bill_to ++ [reference_id: merchant_reference_code_validated]
 
           EEx.eval_file(get_template("credit_card_create.xml"), assigns: replace_params) |> call()
         else
@@ -202,9 +211,15 @@ defmodule CyberSourceSDK.Client do
         bill_to,
         worker \\ :merchant
       )
+
   def update_credit_card(merchant_reference_code, token, credit_card, bill_to, worker) do
-    credit_card = if is_nil(credit_card), do: CyberSourceSDK.credit_card(nil, nil, nil), else: credit_card
-    bill_to = if is_nil(bill_to), do: CyberSourceSDK.bill_to(nil, nil, nil, nil, nil, nil, nil, nil, nil), else: bill_to
+    credit_card =
+      if is_nil(credit_card), do: CyberSourceSDK.credit_card(nil, nil, nil), else: credit_card
+
+    bill_to =
+      if is_nil(bill_to),
+        do: CyberSourceSDK.bill_to(nil, nil, nil, nil, nil, nil, nil, nil, nil),
+        else: bill_to
 
     case validate_merchant_reference_code(merchant_reference_code) do
       {:error, reason} ->
@@ -212,8 +227,12 @@ defmodule CyberSourceSDK.Client do
 
       merchant_reference_code_validated ->
         merchant_configuration = get_configuration_params(worker)
+
         if length(merchant_configuration) > 0 do
-          replace_params = CyberSourceSDK.Client.get_configuration_params(worker) ++ credit_card ++ bill_to ++ [reference_id: merchant_reference_code_validated, token: token]
+          replace_params =
+            CyberSourceSDK.Client.get_configuration_params(worker) ++
+              credit_card ++
+              bill_to ++ [reference_id: merchant_reference_code_validated, token: token]
 
           EEx.eval_file(get_template("credit_card_update.xml"), assigns: replace_params) |> call()
         else
@@ -236,6 +255,7 @@ defmodule CyberSourceSDK.Client do
         token,
         worker \\ :merchant
       )
+
   def retrieve_credit_card(merchant_reference_code, token, worker) do
     case validate_merchant_reference_code(merchant_reference_code) do
       {:error, reason} ->
@@ -243,10 +263,14 @@ defmodule CyberSourceSDK.Client do
 
       merchant_reference_code_validated ->
         merchant_configuration = get_configuration_params(worker)
-        if length(merchant_configuration) > 0 do
-          replace_params = CyberSourceSDK.Client.get_configuration_params(worker) ++ [reference_id: merchant_reference_code_validated, token: token]
 
-          EEx.eval_file(get_template("credit_card_retrieve.xml"), assigns: replace_params) |> call()
+        if length(merchant_configuration) > 0 do
+          replace_params =
+            CyberSourceSDK.Client.get_configuration_params(worker) ++
+              [reference_id: merchant_reference_code_validated, token: token]
+
+          EEx.eval_file(get_template("credit_card_retrieve.xml"), assigns: replace_params)
+          |> call()
         else
           Helper.invalid_merchant_configuration()
         end
@@ -267,6 +291,7 @@ defmodule CyberSourceSDK.Client do
         token,
         worker \\ :merchant
       )
+
   def delete_credit_card(merchant_reference_code, token, worker) do
     case validate_merchant_reference_code(merchant_reference_code) do
       {:error, reason} ->
@@ -274,8 +299,11 @@ defmodule CyberSourceSDK.Client do
 
       merchant_reference_code_validated ->
         merchant_configuration = get_configuration_params(worker)
+
         if length(merchant_configuration) > 0 do
-          replace_params = CyberSourceSDK.Client.get_configuration_params(worker) ++ [reference_id: merchant_reference_code_validated, token: token]
+          replace_params =
+            CyberSourceSDK.Client.get_configuration_params(worker) ++
+              [reference_id: merchant_reference_code_validated, token: token]
 
           EEx.eval_file(get_template("credit_card_delete.xml"), assigns: replace_params) |> call()
         else
@@ -299,6 +327,7 @@ defmodule CyberSourceSDK.Client do
         token,
         worker \\ :merchant
       )
+
   def charge_credit_card(price, merchant_reference_code, token, worker) do
     case validate_merchant_reference_code(merchant_reference_code) do
       {:error, reason} ->
@@ -306,8 +335,11 @@ defmodule CyberSourceSDK.Client do
 
       merchant_reference_code_validated ->
         merchant_configuration = get_configuration_params(worker)
+
         if length(merchant_configuration) > 0 do
-          replace_params = CyberSourceSDK.Client.get_configuration_params(worker) ++ [reference_id: merchant_reference_code_validated, token: token, price: price]
+          replace_params =
+            CyberSourceSDK.Client.get_configuration_params(worker) ++
+              [reference_id: merchant_reference_code_validated, token: token, price: price]
 
           EEx.eval_file(get_template("credit_card_charge.xml"), assigns: replace_params) |> call()
         else
@@ -331,6 +363,7 @@ defmodule CyberSourceSDK.Client do
         token,
         worker \\ :merchant
       )
+
   def auth_credit_card(price, merchant_reference_code, token, worker) do
     case validate_merchant_reference_code(merchant_reference_code) do
       {:error, reason} ->
@@ -338,8 +371,11 @@ defmodule CyberSourceSDK.Client do
 
       merchant_reference_code_validated ->
         merchant_configuration = get_configuration_params(worker)
+
         if length(merchant_configuration) > 0 do
-          replace_params = CyberSourceSDK.Client.get_configuration_params(worker) ++ [reference_id: merchant_reference_code_validated, token: token, price: price]
+          replace_params =
+            CyberSourceSDK.Client.get_configuration_params(worker) ++
+              [reference_id: merchant_reference_code_validated, token: token, price: price]
 
           EEx.eval_file(get_template("credit_card_auth.xml"), assigns: replace_params) |> call()
         else
@@ -594,10 +630,15 @@ defmodule CyberSourceSDK.Client do
 
     if !is_nil(merchant_configuration) do
       merchant_configuration = merchant_configuration |> Enum.into(%{})
+
       [
-        merchant_id: Map.get(merchant_configuration, :id) || System.get_env("CYBERSOURCE_MERCHANT_ID"),
-        transaction_key: Map.get(merchant_configuration, :transaction_key) || System.get_env("CYBERSOURCE_TRANSACTION_KEY"),
-        currency: Map.get(merchant_configuration, :currency) || System.get_env("CYBERSOURCE_CURRENCY"),
+        merchant_id:
+          Map.get(merchant_configuration, :id) || System.get_env("CYBERSOURCE_MERCHANT_ID"),
+        transaction_key:
+          Map.get(merchant_configuration, :transaction_key) ||
+            System.get_env("CYBERSOURCE_TRANSACTION_KEY"),
+        currency:
+          Map.get(merchant_configuration, :currency) || System.get_env("CYBERSOURCE_CURRENCY"),
         client_library: "CyberSourceSDK Elixir #{Application.spec(:cybersource_sdk, :vsn)}"
       ]
     else
@@ -608,24 +649,24 @@ defmodule CyberSourceSDK.Client do
   # Make HTTPS request
   @spec call(String.t()) :: {:ok, map()} | {:error, String.t()} | {:error, :unknown_response}
   defp call(xml_body) do
-    endpoint = Application.get_env(:cybersource_sdk, :endpoint) || System.get_env("CYBERSOURCE_ENDPOINT")
+    endpoint =
+      Application.get_env(:cybersource_sdk, :endpoint) || System.get_env("CYBERSOURCE_ENDPOINT")
+
     timeout = Application.get_env(:cybersource_sdk, :timeout, 60_000)
 
     case HTTPoison.post(
            endpoint,
            xml_body,
            [{"Content-Type", "application/xml"}],
-           [
-             timeout: timeout,
-             recv_timeout: timeout
-           ]
+           timeout: timeout,
+           recv_timeout: timeout
          ) do
       {:ok, %HTTPoison.Response{body: response_body}} ->
         parse_response(response_body)
         |> handle_response
 
       {:error, %HTTPoison.Error{id: _, reason: reason}} = response ->
-        Logger.info("Timeout: #{timeout}")
+        Logger.error("Timeout: #{timeout}")
         Logger.error("#{inspect(response)}")
         {:error, reason}
     end
@@ -701,17 +742,17 @@ defmodule CyberSourceSDK.Client do
       paySubscriptionCreateReply: [
         ~x".//c:paySubscriptionCreateReply"o,
         reasonCode: ~x"./c:reasonCode/text()"i,
-        subscriptionID: ~x"./c:subscriptionID/text()"i,
+        subscriptionID: ~x"./c:subscriptionID/text()"i
       ],
       paySubscriptionUpdateReply: [
         ~x".//c:paySubscriptionUpdateReply"o,
         reasonCode: ~x"./c:reasonCode/text()"i,
-        subscriptionID: ~x"./c:subscriptionID/text()"i,
+        subscriptionID: ~x"./c:subscriptionID/text()"i
       ],
       paySubscriptionDeleteReply: [
         ~x".//c:paySubscriptionDeleteReply"o,
         reasonCode: ~x"./c:reasonCode/text()"i,
-        subscriptionID: ~x"./c:subscriptionID/text()"i,
+        subscriptionID: ~x"./c:subscriptionID/text()"i
       ],
       paySubscriptionRetrieveReply: [
         ~x".//c:paySubscriptionRetrieveReply"o,
@@ -755,9 +796,14 @@ defmodule CyberSourceSDK.Client do
     cond do
       response.decision != "" ->
         case response.decision do
-          "ACCEPT" -> {:ok, response}
-          "REJECT" -> {:error, response.reasonCode, reason_from_code(response.reasonCode), response}
-          "ERROR" -> {:error, response.reasonCode, reason_from_code(response.reasonCode), response}
+          "ACCEPT" ->
+            {:ok, response}
+
+          "REJECT" ->
+            {:error, response.reasonCode, reason_from_code(response.reasonCode), response}
+
+          "ERROR" ->
+            {:error, response.reasonCode, reason_from_code(response.reasonCode), response}
         end
 
       response.fault.faultCode != "" ->

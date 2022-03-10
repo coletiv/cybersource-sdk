@@ -11,9 +11,7 @@ defmodule CyberSourceSDK.Logger do
   end
 
   def error(it) do
-    if should_log?() do
-      Logger.error("[CyberSourceSDK] #{it}")
-    end
+    Logger.error("[CyberSourceSDK] #{it}")
   end
 
   defp should_log? do
