@@ -4,9 +4,10 @@ defmodule CyberSourceSDK.Mixfile do
   def project do
     [
       app: :cybersource_sdk,
-      version: "1.0.4",
+      version: "1.0.5",
       elixir: "~> 1.2",
       deps: deps(),
+      test_coverage: [tool: ExCoveralls],
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       package: [
@@ -44,8 +45,12 @@ defmodule CyberSourceSDK.Mixfile do
   defp deps do
     [
       {:sweet_xml, "~> 0.6"},
-      {:httpoison, "~> 0.13"},
+      {:httpoison, "~> 1.6"},
       {:poison, ">= 2.0.0"},
+      {:cowboy, "~> 2.5"},
+      {:plug_cowboy, "~> 2.0"},
+      {:exvcr, "~> 0.10.3", only: [:dev, :test]},
+      {:excoveralls, "~> 0.11.1", only: [:dev, :test]},
       {:ex_doc, "~> 0.19", only: :dev, runtime: false},
       {:bypass, "~> 0.6", only: :test}
     ]
